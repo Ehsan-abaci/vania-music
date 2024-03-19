@@ -1,0 +1,10 @@
+{
+  "app": "vania-music",
+  "port": 8000,
+  "disks": [
+    {
+      "name": "music",
+      "mountTo": "/storage"
+    }
+  ]
+}

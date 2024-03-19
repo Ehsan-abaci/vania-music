@@ -1,0 +1,28 @@
+version: '3.9'
+
+services:
+  app:
+    build: .
+    image: app
+    container_name: app
+    restart: always
+    working_dir: /www
+    volumes:
+      - .:/www
+    ports:
+      - 8000:8000
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:latest
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456 #Database root password
+      - MYSQL_DATABASE=MyDB #Database name
+      - MYSQL_USER=DBUser #Database user
+      - MYSQL_PASSWORD=123456 #Database password
+    ports:
+      - 3306:3306
+    volumes:
+      - $PWD/mysql:/var/lib/mysql 
