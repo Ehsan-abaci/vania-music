@@ -5,6 +5,8 @@ import 'package:lottie/lottie.dart';
 import 'package:vania_music/core/utils/resources/assets_manager.dart';
 import 'package:vania_music/core/utils/resources/color_manager.dart';
 import 'package:vania_music/core/widgets/blur_background.dart';
+import 'package:vania_music/features/file_manager/presentation/value_notifier/download_file.dart';
+import 'package:vania_music/features/file_manager/presentation/widget/download_dialog.dart';
 import 'package:vania_music/features/music/presentation/bloc/music/music_bloc.dart';
 import 'package:vania_music/features/player/domain/repository/player_repository.dart';
 import 'package:vania_music/features/player/presentation/bloc/player/player_bloc.dart';
@@ -30,6 +32,7 @@ class MusicsList extends StatelessWidget {
   MusicsList({super.key});
   late List<Tile> tiles = [];
   final _player = di<PlayerRepository>();
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<MusicBloc, MusicState>(
@@ -76,7 +79,7 @@ class MusicsList extends StatelessWidget {
   }
 }
 
-class MusicListTile extends StatelessWidget {
+class MusicListTile extends StatefulWidget {
   const MusicListTile({
     super.key,
     required PlayerRepository player,
@@ -91,11 +94,26 @@ class MusicListTile extends StatelessWidget {
   final List<Tile> tiles;
 
   @override
+  State<MusicListTile> createState() => _MusicListTileState();
+}
+
+class _MusicListTileState extends State<MusicListTile> {
+  void downloadMusic(String musicUrl) async {
+    di<DownloadFile>().saveMusicInStorage(
+      url: musicUrl,
+    );
+    await showDialog(
+      context: context,
+      builder: (context) => DownloadDialog(),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: StreamBuilder<bool>(
-        stream: _player.playing,
+        stream: widget._player.playing,
         builder: (context, snapshot) {
           var isPlaying = snapshot.data ?? false;
           return BlocBuilder<MusicBloc, MusicState>(
@@ -115,20 +133,21 @@ class MusicListTile extends StatelessWidget {
                     }
                     context.read<PlayerBloc>().add(
                           PlayerPlay(
-                            id: state.musics[index].id,
+                            id: state.musics[widget.index].id,
                           ),
                         );
                   },
                   // tileColor: Colors.grey.shade50,
                   leading: StreamBuilder<MediaItem?>(
-                      stream: _player.mediaItem,
+                      stream: widget._player.mediaItem,
                       builder: (context, snapshot) {
-                        return snapshot.data?.id == state.musics[index].id &&
+                        return snapshot.data?.id ==
+                                    state.musics[widget.index].id &&
                                 isPlaying
                             ? SizedBox(
                                 width: 24,
                                 child: ColorFiltered(
-                                  colorFilter:  ColorFilter.mode(
+                                  colorFilter: ColorFilter.mode(
                                     Theme.of(context).colorScheme.onPrimary,
                                     BlendMode.srcIn,
                                   ),
@@ -138,7 +157,7 @@ class MusicListTile extends StatelessWidget {
                                 ),
                               )
                             : Text(
-                                num,
+                                widget.num,
                                 style: const TextStyle(
                                   fontSize: 18,
                                   color: Colors.grey,
@@ -146,7 +165,7 @@ class MusicListTile extends StatelessWidget {
                               );
                       }),
                   title: Text(
-                    tiles[index].title,
+                    widget.tiles[widget.index].title,
                     style: const TextStyle(
                       color: Colors.grey,
                       fontSize: 16,
@@ -154,27 +173,26 @@ class MusicListTile extends StatelessWidget {
                     ),
                   ),
                   subtitle: StreamBuilder<MediaItem?>(
-                      stream: _player.mediaItem,
+                      stream: widget._player.mediaItem,
                       builder: (context, snapshot) {
-                        return snapshot.data?.id == state.musics[index].id
+                        return snapshot.data?.id ==
+                                state.musics[widget.index].id
                             ? Text(
                                 isPlaying ? "Now playing" : "Paused",
                                 style: const TextStyle(
-                                  // color: ColorManager.green,
                                   fontWeight: FontWeight.w600,
                                 ),
                               )
                             : Text(
-                                tiles[index].subtitle,
+                                widget.tiles[widget.index].subtitle,
                                 style: const TextStyle(
                                     color: Colors.grey,
                                     fontWeight: FontWeight.w600),
                               );
                       }),
                   trailing: IconButton(
-                    onPressed: () => _player.saveMusicInStorage(
-                      url: state.musics[index].musicUrl,
-                    ),
+                    onPressed: () =>
+                        downloadMusic(state.musics[widget.index].musicUrl),
                     icon: const Icon(Icons.more_horiz_rounded),
                   ),
                 );

@@ -1,27 +1,30 @@
 import 'dart:io';
 
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
+import 'package:vania_music/core/resources/data_state.dart';
 
 class IoClient {
-  static Future<String?> download(
-      {required String url, required String path}) async {
+  static Future<DataState<String?>> download({
+    required String url,
+    required String path,
+    required ValueNotifier downloadProgressNotifier,
+  }) async {
     try {
-      final res = await http.get(
-        Uri.parse(url),
-      );
+      final res = await Dio().downloadUri(Uri.parse(url), path,
+          onReceiveProgress: (actualBytes, int totalBytes) {
+        downloadProgressNotifier.value =
+            (actualBytes / totalBytes * 100).floor();
+      });
       if (res.statusCode == 200) {
-        final bytes = res.bodyBytes;
-        final file = File(path);
-        await file.writeAsBytes(bytes);
-        return path;
+        return DataSuccess(path);
       } else {
-        return null;
+        return DataFailed(res.statusMessage ?? "Failed");
       }
-    } on IOException catch (e) {
-      print('Error occurs while downloading file: $e');
-      return null;
+    } on DioException catch (e) {
+      return DataFailed('Error occurs while downloading file: $e');
     } catch (e) {
-      return null;
+      return DataFailed(e.toString());
     }
   }
 }

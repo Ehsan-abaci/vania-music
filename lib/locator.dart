@@ -15,6 +15,7 @@ import 'package:vania_music/features/file_manager/data/repository/file_manager_r
 import 'package:vania_music/features/file_manager/data/repository/file_storage_manager_repositoryImpl.dart';
 import 'package:vania_music/features/file_manager/domain/repository/file_manager_repository.dart';
 import 'package:vania_music/features/file_manager/domain/repository/file_storage_manager_repository.dart';
+import 'package:vania_music/features/file_manager/presentation/value_notifier/download_file.dart';
 import 'package:vania_music/features/music/data/data_source/local/music_cache.dart';
 import 'package:vania_music/features/music/data/data_source/remote/music_api_provider.dart';
 import 'package:vania_music/features/music/data/repository/music_repositoryImpl.dart';
@@ -53,8 +54,7 @@ Future<void> initAppModule() async {
       () => FileStorageManagerRepositoryImpl());
   di.registerLazySingleton<FileManagerRepository>(
       () => FileManagerRepositoryImpl(di()));
-  di.registerLazySingleton<PlayerRepository>(
-      () => PlayerRepositoryImpl(di(), di()));
+  di.registerLazySingleton<PlayerRepository>(() => PlayerRepositoryImpl());
   di.registerLazySingleton<MusicAlbumRepository>(
       () => MusicAlbumRepositoryImpl(di(), di(), di()));
   di.registerLazySingleton<MusicRepository>(
@@ -77,4 +77,6 @@ Future<void> initAppModule() async {
   di.registerLazySingleton(() => ThemeBloc(
       di<PlayerRepository>().currentMediaItemStreamController.stream));
 
+  /// Value notifier
+  di.registerLazySingleton(() => DownloadFile(di(), di()));
 }

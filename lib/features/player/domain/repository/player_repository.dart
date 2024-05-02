@@ -51,7 +51,6 @@ abstract class PlayerRepository {
   // playing
   Stream<bool> get playing => audioPlayer.playingStream;
 
-  Future<void> saveMusicInStorage({required String url});
   bool areMediaItemsEqual(List<MusicEntity> songs);
   Future<void> addMediaToPlaylist();
   Future<void> play(String? id);

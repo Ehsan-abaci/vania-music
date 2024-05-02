@@ -1,13 +1,19 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:vania_music/core/resources/data_state.dart';
 
 abstract class FileManagerRepository {
   File? file;
 
   Future<void> saveFile(String url);
-  Future<String?> downloadFile({required String url, required String path});
+  Future<DataState<String?>> downloadFile({
+    required String url,
+    required String path,
+    required ValueNotifier downloadProgressNotifier,
+  });
   Future<bool> existedInLocal(String url);
 
   static Future<Directory> openDir() async {

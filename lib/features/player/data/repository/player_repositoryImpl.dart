@@ -1,20 +1,13 @@
 import 'dart:async';
-import 'dart:developer';
-import 'dart:io';
 import 'dart:math' show Random;
 
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_cache/just_audio_cache.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:vania_music/core/utils/formatter.dart';
-import 'package:vania_music/features/file_manager/domain/repository/file_manager_repository.dart';
 import 'package:vania_music/features/music/domain/entities/music_entity.dart';
 import 'package:vania_music/features/player/domain/repository/player_repository.dart';
 
 class PlayerRepositoryImpl extends PlayerRepository {
-  final SharedPreferences _sp;
-  final FileManagerRepository _fileManager;
-  PlayerRepositoryImpl(this._fileManager, this._sp) {
+  PlayerRepositoryImpl() {
     loadEmptyPlaylist();
   }
   @override
@@ -36,33 +29,6 @@ class PlayerRepositoryImpl extends PlayerRepository {
     lastIndex = currentIndex;
     await addMediaToPlaylist();
     currentMediaItemStreamController.add(mediaItems[lastIndex]);
-  }
-
-  @override
-  Future<void> saveMusicInStorage({required String url}) async {
-    log("*****Click Save music*****");
-    if (!await _fileManager.existedInLocal(url)) {
-      log("*****doesn't exist music*****");
-
-      /// set url to download
-      final dirPath = (await FileManagerRepository.openDir()).path;
-      final key = getUrlSuffix(url);
-      _fileManager
-          .downloadFile(url: url, path: '$dirPath/$key')
-          .then((storedPath) async {
-        if (storedPath != null) {
-          await _sp.setString(url, storedPath);
-        }
-      });
-    }
-    String? path = _sp.getString(url);
-    log(path ?? "Empty");
-    if (path == null) return;
-    File file = File(path);
-    await _fileManager.saveFile(url);
-    final music = await file.readAsBytes();
-    await _fileManager.file!.writeAsBytes(music, flush: true);
-    // await file.copy(_fileManager.file!.path);
   }
 
   @override
