@@ -10,6 +10,7 @@ class DownloadDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
+      
       backgroundColor: Theme.of(context).colorScheme.background,
       child: ValueListenableBuilder(
         valueListenable: di<DownloadFile>().downloadProgressNotifier,

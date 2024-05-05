@@ -10,5 +10,7 @@ class FetchMusicEvent extends MusicEvent {
   });
 }
 
-
-
+class ChangeIsDownloadedEvent extends MusicEvent {
+  String id;
+  ChangeIsDownloadedEvent(this.id);
+}

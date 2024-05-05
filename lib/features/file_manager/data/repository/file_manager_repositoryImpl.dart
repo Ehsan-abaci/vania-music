@@ -35,7 +35,7 @@ class FileManagerRepositoryImpl extends FileManagerRepository {
   }
 
   @override
-  Future<bool> existedInLocal(String url) async {
-    return await CachedFile.existedInLocal(url: url);
+  bool existedInLocal(String url)  {
+    return CachedFile.existedInLocal(url: url);
   }
 }

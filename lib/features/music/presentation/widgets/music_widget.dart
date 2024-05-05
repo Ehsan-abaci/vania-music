@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:vania_music/features/music/presentation/bloc/music/music_bloc.dart';
 import 'package:vania_music/features/music_album/presentation/bloc/music_album/music_album_bloc.dart';
 
@@ -36,7 +37,7 @@ class MusicWidget extends StatelessWidget {
                       "${musicAlbum?.name?.split(" ")[0].toUpperCase()}",
                       maxLines: 2,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
+                      style:  GoogleFonts.afacad(
                           fontSize: 35,
                           color: Colors.white,
                           fontWeight: FontWeight.w700),
@@ -50,7 +51,7 @@ class MusicWidget extends StatelessWidget {
                   children: [
                     Text(
                       musicAlbum?.name ?? "",
-                      style: const TextStyle(
+                      style:  GoogleFonts.aBeeZee(
                         fontSize: 24,
                         fontWeight: FontWeight.w900,
                         color: Colors.grey,

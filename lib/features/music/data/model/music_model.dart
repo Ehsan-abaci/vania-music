@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:vania_music/features/music/domain/entities/music_entity.dart';
 
 class MusicModel extends MusicEntity {
-  const MusicModel({
+   MusicModel({
     String? id,
     String? singer,
     String? name,

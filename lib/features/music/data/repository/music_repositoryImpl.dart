@@ -1,5 +1,5 @@
-
 import 'dart:convert';
+import 'dart:developer';
 import 'package:vania_music/core/resources/data_state.dart';
 import 'package:vania_music/core/resources/error_handler.dart';
 import 'package:vania_music/core/resources/network_info.dart';
@@ -21,11 +21,11 @@ class MusicRepositoryImpl extends MusicRepository {
   @override
   Future<DataState<List<MusicEntity>>> fetchMusics(String api) async {
     final bool isConnected = await networkInfo.isConnected;
-    if (await musicCache.isChachedMusics(api) || !isConnected) {
+    if (await musicCache.isChachedMusics(api)) {
       final res = musicCache.fetchMusicFromCache(api);
       return DataSuccess(res);
     }
-    if (isConnected) {
+   else if (isConnected) {
       final response = await apiProvider.fetchMusics(api);
       if (response.statusCode == ResponseCode.SUCCESS) {
         final data = response.body;

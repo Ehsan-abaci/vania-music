@@ -3,10 +3,13 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vania_music/core/resources/data_state.dart';
 import 'package:vania_music/core/utils/formatter.dart';
 import 'package:vania_music/features/file_manager/domain/repository/file_manager_repository.dart';
+import 'package:vania_music/features/music/presentation/bloc/music/music_bloc.dart';
+import 'package:vania_music/locator.dart';
 
 enum DownloadStatus {
   initial,
@@ -18,7 +21,8 @@ enum DownloadStatus {
 class DownloadFile {
   final FileManagerRepository _fileManager;
   final SharedPreferences _sp;
-  DownloadFile(this._fileManager, this._sp);
+  final MusicBloc musicBloc;
+  DownloadFile(this._fileManager, this._sp, this.musicBloc);
 
   ValueNotifier downloadProgressNotifier = ValueNotifier(0);
   ValueNotifier<DownloadStatus> downloadStatus =
@@ -35,7 +39,7 @@ class DownloadFile {
     );
   }
 
-  void saveMusicInStorage({required String url}) async {
+  void saveMusicInStorage({required String url, required String id}) async {
     log("*****Click Save music*****");
     if (!await _fileManager.existedInLocal(url)) {
       log("*****doesn't exist music*****");
@@ -48,10 +52,13 @@ class DownloadFile {
       await _downloadFile(url: url, path: '$dirPath/$key')
           .then((dataState) async {
         final storedPath = dataState.data;
-        dataState is DataSuccess
-            ? downloadStatus.value = DownloadStatus.downloaded
-            : downloadStatus.value = DownloadStatus.error;
-        if (dataState is DataFailed) return;
+        if (dataState is DataSuccess) {
+          downloadStatus.value = DownloadStatus.downloaded;
+          musicBloc.add(ChangeIsDownloadedEvent(id));
+        } else if (dataState is DataFailed) {
+          downloadStatus.value = DownloadStatus.error;
+          return;
+        }
 
         if (storedPath != null) {
           await _sp.setString(url, storedPath);

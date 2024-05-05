@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:vania_music/core/utils/resources/routes.dart';
 import 'package:vania_music/features/favorite/presentation/bloc/favorite/favorite_bloc.dart';
@@ -53,7 +54,10 @@ class _AlbumsScreenState extends State<AlbumsScreen>
             backgroundColor: Colors.transparent,
             elevation: 0,
             centerTitle: true,
-            title: const Text("Vania Music 🎧"),
+            title:  Text(
+              "Vania Music 🎧",
+              style: GoogleFonts.pacifico()
+            ),
           ),
           BlocBuilder<MusicAlbumBloc, MusicAlbumState>(
             builder: (context, state) {
@@ -86,14 +90,15 @@ class _AlbumsScreenState extends State<AlbumsScreen>
                                 alignment: Alignment.center,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(15),
-                                  color: Theme.of(context).colorScheme.background,
+                                  color:
+                                      Theme.of(context).colorScheme.background,
                                 ),
                                 child: Text(
                                   state.musicAlbums?[i].name!
                                           .split(" ")[0]
                                           .toUpperCase() ??
                                       "",
-                                  style: const TextStyle(
+                                  style:  GoogleFonts.afacad(
                                     fontSize: 40,
                                     fontWeight: FontWeight.w800,
                                     color: Colors.white,
@@ -105,7 +110,7 @@ class _AlbumsScreenState extends State<AlbumsScreen>
                           const SizedBox(height: 5),
                           Text(
                             "${state.musicAlbums?[i].name}",
-                            style: const TextStyle(
+                            style:  GoogleFonts.aBeeZee(
                                 fontSize: 16, fontWeight: FontWeight.w400),
                           )
                         ],

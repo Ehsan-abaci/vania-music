@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:vania_music/core/widgets/blur_background.dart';
 import 'package:vania_music/features/music/presentation/bloc/music/music_bloc.dart';
@@ -143,7 +144,7 @@ class MusicScreenAppBar extends StatelessWidget {
         child: isCollapased
             ? Text(
                 title,
-                style: const TextStyle(
+                style:  GoogleFonts.aBeeZee(
                   fontSize: 24,
                   fontWeight: FontWeight.w900,
                   color: Colors.grey,

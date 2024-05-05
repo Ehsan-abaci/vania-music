@@ -72,11 +72,11 @@ Future<void> initAppModule() async {
   /// Blocs
   di.registerLazySingleton(() => FavoriteBloc(di(), di(), di()));
   di.registerLazySingleton(() => MusicAlbumBloc(di()));
-  di.registerLazySingleton(() => MusicBloc(di()));
+  di.registerLazySingleton(() => MusicBloc(di(),di()));
   di.registerLazySingleton(() => PlayerBloc(di()));
   di.registerLazySingleton(() => ThemeBloc(
       di<PlayerRepository>().currentMediaItemStreamController.stream));
 
   /// Value notifier
-  di.registerLazySingleton(() => DownloadFile(di(), di()));
+  di.registerLazySingleton(() => DownloadFile(di(), di(), di()));
 }

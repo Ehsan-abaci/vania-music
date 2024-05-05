@@ -1,10 +1,5 @@
 import 'dart:developer';
-import 'dart:ui';
-import 'package:flutter/animation.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:just_audio_background/just_audio_background.dart';
@@ -299,9 +294,11 @@ class _MusicBottomSheetState extends State<MusicBottomSheet>
                                     .any(
                                       (e) => e.id == currentMusic!.id,
                                     )
-                                ?  Icon(
+                                ? Icon(
                                     Icons.favorite_rounded,
-                                   color:Theme.of(context).colorScheme.onSecondary,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSecondary,
                                     size: 30,
                                   )
                                 : const Icon(
@@ -418,257 +415,248 @@ class _MusicBottomSheetState extends State<MusicBottomSheet>
         child: Opacity(
           opacity: _opacityAnimation?.value,
           child: Column(
-              children: [
-                SizedBox(
-                  width: MediaQuery.sizeOf(context).width,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      StreamBuilder<MediaItem?>(
-                          stream: _player.mediaItem,
-                          builder: (context, snapshot) {
-                            if (!snapshot.hasData) return const SizedBox();
-                            final currentMusic = snapshot.data;
-                            return RepaintBoundary(
-                              child: IconButton(
-                                onPressed: () => context.read<FavoriteBloc>().add(
-                                    ToggleFavorite(
-                                        music: snapshot.data.toMusic())),
-                                icon: BlocBuilder<FavoriteBloc, FavoriteState>(
-                                  buildWhen: (previous, current) {
-                                    if (previous.tfStatus == current.tfStatus) {
-                                      return false;
-                                    }
-                                    return true;
-                                  },
-                                  builder: (context, state) {
-                                    if (state.fmStatus is FmCompelete) {
-                                      return (state.fmStatus as FmCompelete)
-                                              .favoriteMusics
-                                              .any(
-                                                  (e) => e.id == currentMusic!.id)
-                                          ?  Icon(
-                                              Icons.favorite_rounded,
-                                              color:Theme.of(context).colorScheme.onSecondary,
-                                              size: 30,
-                                            )
-                                          : const Icon(
-                                              Icons.favorite_border_rounded,
-                                              color: Colors.grey,
-                                            );
-                                    }
-                              
-                                    return SizedBox();
-                                  },
-                                ),
-                                color: Colors.grey,
+            children: [
+              SizedBox(
+                width: MediaQuery.sizeOf(context).width,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    StreamBuilder<MediaItem?>(
+                        stream: _player.mediaItem,
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) return const SizedBox();
+                          final currentMusic = snapshot.data;
+                          return RepaintBoundary(
+                            child: IconButton(
+                              onPressed: () => context.read<FavoriteBloc>().add(
+                                  ToggleFavorite(
+                                      music: snapshot.data.toMusic())),
+                              icon: BlocBuilder<FavoriteBloc, FavoriteState>(
+                                buildWhen: (previous, current) {
+                                  if (previous.tfStatus == current.tfStatus) {
+                                    return false;
+                                  }
+                                  return true;
+                                },
+                                builder: (context, state) {
+                                  if (state.fmStatus is FmCompelete) {
+                                    return (state.fmStatus as FmCompelete)
+                                            .favoriteMusics
+                                            .any(
+                                                (e) => e.id == currentMusic!.id)
+                                        ? Icon(
+                                            Icons.favorite_rounded,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSecondary,
+                                            size: 30,
+                                          )
+                                        : const Icon(
+                                            Icons.favorite_border_rounded,
+                                            color: Colors.grey,
+                                          );
+                                  }
+
+                                  return SizedBox();
+                                },
                               ),
-                            );
-                          }),
-                      StreamBuilder<int?>(
-                          stream: _player.currentIndexStream,
-                          builder: (context, snapshot) {
-                            var mediaItem = _player.mediaItems[
-                                snapshot.data ?? _player.currentIndex];
-                            return Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  FittedBox(
-                                    child: Text(
-                                      mediaItem.title,
-                                      softWrap: true,
-                                      style: const TextStyle(
-                                          fontSize: 30,
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w700),
-                                    ),
-                                  ),
-                                  Text(
-                                    mediaItem.artist!,
+                              color: Colors.grey,
+                            ),
+                          );
+                        }),
+                    StreamBuilder<int?>(
+                        stream: _player.currentIndexStream,
+                        builder: (context, snapshot) {
+                          var mediaItem = _player.mediaItems[
+                              snapshot.data ?? _player.currentIndex];
+                          return Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                FittedBox(
+                                  child: Text(
+                                    mediaItem.title,
+                                    softWrap: true,
                                     style: const TextStyle(
-                                        fontSize: 16, color: Colors.grey),
+                                        fontSize: 30,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w700),
                                   ),
-                                ],
-                              ),
-                            );
-                          }),
-                      CustomIconButton(
-                        onPressed: () {},
-                        icon: const Icon(Icons.more_horiz_rounded),
-                        color: Colors.white,
-                      ),
-                    ],
-                  ),
+                                ),
+                                Text(
+                                  mediaItem.artist!,
+                                  style: const TextStyle(
+                                      fontSize: 16, color: Colors.grey),
+                                ),
+                              ],
+                            ),
+                          );
+                        }),
+                    CustomIconButton(
+                      onPressed: () {},
+                      icon: const Icon(Icons.more_horiz_rounded),
+                      color: Colors.white,
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 20),
-                StreamBuilder<Duration>(
-                    stream: _player.position,
-                    builder: (context, snapshot) {
-                      var position = snapshot.data ?? Duration.zero;
-                      return StreamBuilder<Duration?>(
-                          stream: _player.duration,
-                          builder: (context, snapshot) {
-                            var duration = snapshot.data ?? Duration.zero;
-                            return StreamBuilder<Duration>(
-                                stream: _player.bufferPosition,
-                                builder: (context, snapshot) {
-                                  var bufferPosition =
-                                      snapshot.data ?? Duration.zero;
-                                  return RepaintBoundary(
-                                    child: SliderTheme(
-                                      data: SliderTheme.of(context).copyWith(
-                                          thumbShape:
-                                              const RoundSliderOverlayShape(),
-                                          trackShape:
-                                              const RectangularSliderTrackShape()),
-                                      child: Slider(
-                                        thumbColor: Colors.black,
-                                        inactiveColor:
-                                            Colors.white.withOpacity(.8),
-                                        activeColor: Theme.of(context)
-                                            .colorScheme
-                                            .onPrimary,
-                                        secondaryTrackValue: bufferPosition
-                                                .inMilliseconds
-                                                .toDouble() -
-                                            100,
-                                        secondaryActiveColor: Theme.of(context)
-                                            .colorScheme
-                                            .surface,
-                                        allowedInteraction:
-                                            SliderInteraction.tapAndSlide,
-                                        value:
-                                            position.inMilliseconds.toDouble() -
-                                                100,
-                                        min: -100,
-                                        max: duration.inMilliseconds.toDouble(),
-                                        onChanged: (val) =>
-                                            context.read<PlayerBloc>().add(
-                                                  PlayerSeek(
-                                                    Duration(
-                                                      milliseconds: val.toInt(),
-                                                    ),
+              ),
+              const SizedBox(height: 20),
+              StreamBuilder<Duration>(
+                  stream: _player.position,
+                  builder: (context, snapshot) {
+                    var position = snapshot.data ?? Duration.zero;
+                    return StreamBuilder<Duration?>(
+                        stream: _player.duration,
+                        builder: (context, snapshot) {
+                          var duration = snapshot.data ?? Duration.zero;
+                          return StreamBuilder<Duration>(
+                              stream: _player.bufferPosition,
+                              builder: (context, snapshot) {
+                                var bufferPosition =
+                                    snapshot.data ?? Duration.zero;
+                                return RepaintBoundary(
+                                  child: SliderTheme(
+                                    data: SliderTheme.of(context).copyWith(
+                                        thumbShape:
+                                            const RoundSliderOverlayShape(),
+                                        trackShape:
+                                            const RectangularSliderTrackShape()),
+                                    child: Slider(
+                                      thumbColor: Colors.black,
+                                      inactiveColor:
+                                          Colors.white.withOpacity(.8),
+                                      activeColor: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimary,
+                                      secondaryTrackValue: bufferPosition
+                                              .inMilliseconds
+                                              .toDouble() -
+                                          100,
+                                      secondaryActiveColor:
+                                          Theme.of(context).colorScheme.surface,
+                                      allowedInteraction:
+                                          SliderInteraction.tapAndSlide,
+                                      value:
+                                          position.inMilliseconds.toDouble() -
+                                              100,
+                                      min: -100,
+                                      max: duration.inMilliseconds.toDouble(),
+                                      onChanged: (val) =>
+                                          context.read<PlayerBloc>().add(
+                                                PlayerSeek(
+                                                  Duration(
+                                                    milliseconds: val.toInt(),
                                                   ),
                                                 ),
-                                      ),
-                                    ),
-                                  );
-                                });
-                          });
-                    }),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 23),
-                  child: RepaintBoundary(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        StreamBuilder<Duration>(
-                            stream: _player.position,
-                            builder: (context, snapshot) {
-                              var currentPosition =
-                                  snapshot.data ?? Duration.zero;
-                              return Text(
-                                currentPosition.toHms(),
-                              );
-                            }),
-                        StreamBuilder<Duration?>(
-                            stream: _player.duration,
-                            builder: (context, snapshot) {
-                              var duration = snapshot.data ?? Duration.zero;
-                              return Text(
-                                duration.toHms(),
-                                style: const TextStyle(color: Colors.grey),
-                              );
-                            }),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    IconButton(
-                      onPressed: () {},
-                      color: Colors.white,
-                      icon: const Icon(Icons.shuffle),
-                    ),
-                    IconButton(
-                      onPressed: () =>
-                          context.read<PlayerBloc>().add(PlayerPrevious()),
-                      color: Colors.white,
-                      icon: const Icon(Icons.skip_previous_rounded),
-                      iconSize: 40,
-                    ),
-                    StreamBuilder<bool>(
-                        stream: _player.playing,
-                        builder: (context, snapshot) {
-                          var isPlaying = snapshot.data ?? false;
-                          return StreamBuilder<MediaItem?>(
-                              stream: _player.mediaItem,
-                              builder: (context, snapshot) {
-                                var currentItem = snapshot.data;
-
-                                return RepaintBoundary(
-                                  child: ShaderMask(
-                                    shaderCallback: (bounds) => RadialGradient(
-                                      colors: [
-                                        Theme.of(context).colorScheme.onSurface,
-                                        Theme.of(context).colorScheme.surface,
-                                        Theme.of(context).colorScheme.onSecondary,
-                                      ],
-                                      stops: [.6, .8, 1],
-                                    ).createShader(Rect.fromCircle(
-                                        center: bounds.center,
-                                        radius: bounds.height / 2)),
-                                    child: ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        shape: const CircleBorder(),
-                                        padding: EdgeInsets.zero,
-                                        fixedSize: const Size.fromRadius(35),
-                                      ),
-                                      onPressed: () {
-                                        if (isPlaying) {
-                                          context.read<PlayerBloc>().add(
-                                                PlayerPause(),
-                                              );
-                                        } else {
-                                          context.read<PlayerBloc>().add(
-                                                PlayerPlay(id: currentItem?.id),
-                                              );
-                                        }
-                                      },
-                                      child: Icon(
-                                        isPlaying
-                                            ? Icons.pause
-                                            : Icons.play_arrow_rounded,
-                                        size: 35,
-                                        color: Colors.white,
-                                      ),
+                                              ),
                                     ),
                                   ),
                                 );
                               });
-                        }),
-                    IconButton(
-                      onPressed: () =>
-                          context.read<PlayerBloc>().add(PlayerNext()),
-                      color: Colors.white,
-                      icon: Icon(Icons.skip_next_rounded),
-                      iconSize: 40,
-                    ),
-                    IconButton(
-                      onPressed: () {},
-                      color: Colors.grey,
-                      icon: Icon(Icons.repeat),
-                    ),
-                  ],
+                        });
+                  }),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 23),
+                child: RepaintBoundary(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      StreamBuilder<Duration>(
+                          stream: _player.position,
+                          builder: (context, snapshot) {
+                            var currentPosition =
+                                snapshot.data ?? Duration.zero;
+                            return Text(
+                              currentPosition.toHms(),
+                            );
+                          }),
+                      StreamBuilder<Duration?>(
+                          stream: _player.duration,
+                          builder: (context, snapshot) {
+                            var duration = snapshot.data ?? Duration.zero;
+                            return Text(
+                              duration.toHms(),
+                              style: const TextStyle(color: Colors.grey),
+                            );
+                          }),
+                    ],
+                  ),
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  IconButton(
+                    onPressed: () {},
+                    color: Colors.white,
+                    icon: const Icon(Icons.shuffle),
+                  ),
+                  IconButton(
+                    onPressed: () =>
+                        context.read<PlayerBloc>().add(PlayerPrevious()),
+                    color: Colors.white,
+                    icon: const Icon(Icons.skip_previous_rounded),
+                    iconSize: 40,
+                  ),
+                  StreamBuilder<bool>(
+                      stream: _player.playing,
+                      builder: (context, snapshot) {
+                        var isPlaying = snapshot.data ?? false;
+                        return StreamBuilder<MediaItem?>(
+                            stream: _player.mediaItem,
+                            builder: (context, snapshot) {
+                              var currentItem = snapshot.data;
+
+                              return RepaintBoundary(
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    // backgroundColor:
+                                    // Theme.of(context).colorScheme.,
+                                    shape: const CircleBorder(),
+                                    padding: EdgeInsets.zero,
+                                    fixedSize: const Size.fromRadius(35),
+                                  ),
+                                  onPressed: () {
+                                    if (isPlaying) {
+                                      context.read<PlayerBloc>().add(
+                                            PlayerPause(),
+                                          );
+                                    } else {
+                                      context.read<PlayerBloc>().add(
+                                            PlayerPlay(id: currentItem?.id),
+                                          );
+                                    }
+                                  },
+                                  child: Icon(
+                                    isPlaying
+                                        ? Icons.pause
+                                        : Icons.play_arrow_rounded,
+                                    size: 35,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              );
+                            });
+                      }),
+                  IconButton(
+                    onPressed: () =>
+                        context.read<PlayerBloc>().add(PlayerNext()),
+                    color: Colors.white,
+                    icon: Icon(Icons.skip_next_rounded),
+                    iconSize: 40,
+                  ),
+                  IconButton(
+                    onPressed: () {},
+                    color: Colors.grey,
+                    icon: Icon(Icons.repeat),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

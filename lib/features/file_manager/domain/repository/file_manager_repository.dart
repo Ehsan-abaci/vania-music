@@ -14,7 +14,7 @@ abstract class FileManagerRepository {
     required String path,
     required ValueNotifier downloadProgressNotifier,
   });
-  Future<bool> existedInLocal(String url);
+  bool existedInLocal(String url);
 
   static Future<Directory> openDir() async {
     final dir = await getApplicationDocumentsDirectory();

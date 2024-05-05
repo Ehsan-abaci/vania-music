@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio_background/just_audio_background.dart';
@@ -7,6 +9,7 @@ import 'package:vania_music/core/utils/resources/color_manager.dart';
 import 'package:vania_music/core/widgets/blur_background.dart';
 import 'package:vania_music/features/file_manager/presentation/value_notifier/download_file.dart';
 import 'package:vania_music/features/file_manager/presentation/widget/download_dialog.dart';
+import 'package:vania_music/features/music/domain/entities/music_entity.dart';
 import 'package:vania_music/features/music/presentation/bloc/music/music_bloc.dart';
 import 'package:vania_music/features/player/domain/repository/player_repository.dart';
 import 'package:vania_music/features/player/presentation/bloc/player/player_bloc.dart';
@@ -46,7 +49,12 @@ class MusicsList extends StatelessWidget {
         } else if (state is MusicErrorState) {
           return SliverFillRemaining(
             child: Center(
-              child: Text(state.message ?? "Somthing went wrong..."),
+              child: Text(
+                state.message ?? "Somthing went wrong...",
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              ),
             ),
           );
         } else if (state is MusicCompletedState) {
@@ -98,11 +106,13 @@ class MusicListTile extends StatefulWidget {
 }
 
 class _MusicListTileState extends State<MusicListTile> {
-  void downloadMusic(String musicUrl) async {
+  void downloadMusic(MusicEntity musicEntity) async {
     di<DownloadFile>().saveMusicInStorage(
-      url: musicUrl,
+      id: musicEntity.id,
+      url: musicEntity.musicUrl,
     );
     await showDialog(
+      barrierDismissible: false,
       context: context,
       builder: (context) => DownloadDialog(),
     );
@@ -191,9 +201,14 @@ class _MusicListTileState extends State<MusicListTile> {
                               );
                       }),
                   trailing: IconButton(
-                    onPressed: () =>
-                        downloadMusic(state.musics[widget.index].musicUrl),
-                    icon: const Icon(Icons.more_horiz_rounded),
+                    onPressed: () => downloadMusic(
+                      state.musics[widget.index],
+                    ),
+                    icon: Icon(
+                      !state.musics[widget.index].isDownloaded
+                          ? Icons.download
+                          : Icons.download_done_rounded,
+                    ),
                   ),
                 );
               }
