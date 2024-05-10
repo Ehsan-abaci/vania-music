@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -35,7 +37,17 @@ class FileManagerRepositoryImpl extends FileManagerRepository {
   }
 
   @override
-  bool existedInLocal(String url)  {
+  bool existedInLocal(String url) {
     return CachedFile.existedInLocal(url: url);
+  }
+
+  @override
+  Future<String?> existedInLocalStream(String url) async {
+    while (true) {
+      log(url);
+      log(existedInLocal(url).toString());
+      if (existedInLocal(url)) return CachedFile.filePathInLocal(url: url);
+      await Future.delayed(const Duration(milliseconds: 500));
+    }
   }
 }

@@ -15,7 +15,8 @@ abstract class FileManagerRepository {
     required ValueNotifier downloadProgressNotifier,
   });
   bool existedInLocal(String url);
-
+  Future<String?> existedInLocalStream(String url);
+  
   static Future<Directory> openDir() async {
     final dir = await getApplicationDocumentsDirectory();
     final Directory targetDir = Directory('${dir.path}/audio_cache');

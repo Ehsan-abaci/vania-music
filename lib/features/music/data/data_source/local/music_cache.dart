@@ -16,7 +16,7 @@ class MusicCache {
     int expiration = int.parse(map?['expiration'].toString() ?? "0");
     if (!DateTime.now()
         .isBefore(DateTime.fromMillisecondsSinceEpoch(expiration))) {
-      await _sp.remove(key);
+      // await _sp.remove(key);
       return false;
     }
     return true;

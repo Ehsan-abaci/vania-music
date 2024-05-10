@@ -56,7 +56,8 @@ dependencies:
   dio: ^5.4.3+1
   flutter_dotenv: ^5.1.0
   google_fonts: ^6.2.1
-
+  waveform_extractor: ^1.0.3
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter

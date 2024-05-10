@@ -23,3 +23,24 @@ extension MediaItemToMusic on MediaItem? {
     );
   }
 }
+
+extension ListSize<N extends num> on List<N> {
+  List<double> reduceListSize({
+    required int targetSize,
+  }) {
+    if (length > targetSize) {
+      final finalList = <double>[];
+      final chunk = length / targetSize;
+      for (int i = 0; i < targetSize; i++) {
+        final part = skip((chunk * i).floor()).take(chunk.floor());
+        final sum = part.fold<double>(
+            0, (previousValue, element) => previousValue + element);
+        final res = sum / part.length;
+        finalList.add(res);
+      }
+      return finalList;
+    } else {
+      return map((e) => e.toDouble()).toList();
+    }
+  }
+}

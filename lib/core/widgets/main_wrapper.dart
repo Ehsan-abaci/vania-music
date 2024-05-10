@@ -7,6 +7,7 @@ import 'package:vania_music/features/favorite/presentation/bloc/favorite/favorit
 import 'package:vania_music/features/music/presentation/bloc/music/music_bloc.dart';
 import 'package:vania_music/features/music_album/presentation/bloc/music_album/music_album_bloc.dart';
 import 'package:vania_music/features/player/presentation/bloc/player/player_bloc.dart';
+import 'package:vania_music/features/player/presentation/bloc/visualiser/visualiser_cubit.dart';
 import 'package:vania_music/locator.dart';
 
 class MainWrapper extends StatelessWidget {
@@ -22,8 +23,9 @@ class MainWrapper extends StatelessWidget {
         BlocProvider(create: (context) => di<FavoriteBloc>()),
         BlocProvider(create: (context) => di<FavoriteBloc>()),
         BlocProvider(create: (context) => di<ThemeBloc>()),
+        BlocProvider(create: (context) => di<VisualiserCubit>()),
       ],
-      child: MaterialAppRoot(),
+      child: const MaterialAppRoot(),
     );
   }
 }

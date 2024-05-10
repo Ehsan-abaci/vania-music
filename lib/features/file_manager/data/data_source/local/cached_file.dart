@@ -5,7 +5,11 @@ class CachedFile {
   static final _sp = di<SharedPreferences>();
 
   /// Check if the file corresponds the url exists in local
-  static bool existedInLocal({required String url})  {
+  static bool existedInLocal({required String url}) {
     return _sp.getString(url) != null;
+  }
+
+  static String? filePathInLocal({required String url}) {
+    return _sp.getString(url);
   }
 }

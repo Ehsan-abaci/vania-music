@@ -10,6 +10,7 @@ import 'package:vania_music/features/favorite/presentation/bloc/favorite/favorit
 import 'package:vania_music/features/favorite/presentation/bloc/favorite/fm_status.dart';
 import 'package:vania_music/features/player/domain/repository/player_repository.dart';
 import 'package:vania_music/features/player/presentation/bloc/player/player_bloc.dart';
+import 'package:vania_music/features/player/presentation/widget/visualiser.dart';
 import 'package:vania_music/locator.dart';
 
 AnimationController? bottomSheetSizeController;
@@ -123,6 +124,7 @@ class _MusicBottomSheetState extends State<MusicBottomSheet>
   }
 
   _handleDragUpdate(DragUpdateDetails details) {
+    if (details.globalPosition.dy < 200) return;
     bottomSheetSizeController?.value -= details.primaryDelta! / 800;
   }
 
@@ -139,6 +141,31 @@ class _MusicBottomSheetState extends State<MusicBottomSheet>
       bottomSheetSizeController?.fling(
           velocity: bottomSheetSizeController!.value < 0.5 ? -2.0 : 2.0);
     }
+  }
+
+  _onVisualiserTap(TapUpDetails details, Duration duration) {
+    var val =
+        ((details.localPosition.dx / MediaQuery.sizeOf(context).width * 1.2) *
+                duration.inMilliseconds)
+            .clamp(0, duration.inMilliseconds);
+    context.read<PlayerBloc>().add(PlayerSeek(
+          Duration(
+            milliseconds: val.toInt(),
+          ),
+        ));
+  }
+
+  _onVisualiserUpdate(DragUpdateDetails details, Duration duration) {
+    var val =
+        ((details.localPosition.dx / MediaQuery.sizeOf(context).width * 1.2) *
+                duration.inMilliseconds)
+            .clamp(0, duration.inMilliseconds);
+
+    context.read<PlayerBloc>().add(PlayerSeek(
+          Duration(
+            milliseconds: val.toInt(),
+          ),
+        ));
   }
 
   @override
@@ -173,8 +200,8 @@ class _MusicBottomSheetState extends State<MusicBottomSheet>
                     if (bottomSheetSizeController?.status ==
                         AnimationStatus.completed)
                       musicBar(),
-                    if (bottomSheetSizeController?.status !=
-                        AnimationStatus.dismissed)
+                    if (bottomSheetSizeController?.status ==
+                        AnimationStatus.completed)
                       musicExtendedControler(),
                     musicImage(),
                   ],
@@ -502,59 +529,28 @@ class _MusicBottomSheetState extends State<MusicBottomSheet>
                 ),
               ),
               const SizedBox(height: 20),
-              StreamBuilder<Duration>(
-                  stream: _player.position,
+              StreamBuilder<MediaItem?>(
+                  stream: _player.mediaItem,
                   builder: (context, snapshot) {
-                    var position = snapshot.data ?? Duration.zero;
-                    return StreamBuilder<Duration?>(
-                        stream: _player.duration,
-                        builder: (context, snapshot) {
-                          var duration = snapshot.data ?? Duration.zero;
-                          return StreamBuilder<Duration>(
-                              stream: _player.bufferPosition,
-                              builder: (context, snapshot) {
-                                var bufferPosition =
-                                    snapshot.data ?? Duration.zero;
-                                return RepaintBoundary(
-                                  child: SliderTheme(
-                                    data: SliderTheme.of(context).copyWith(
-                                        thumbShape:
-                                            const RoundSliderOverlayShape(),
-                                        trackShape:
-                                            const RectangularSliderTrackShape()),
-                                    child: Slider(
-                                      thumbColor: Colors.black,
-                                      inactiveColor:
-                                          Colors.white.withOpacity(.8),
-                                      activeColor: Theme.of(context)
-                                          .colorScheme
-                                          .onPrimary,
-                                      secondaryTrackValue: bufferPosition
-                                              .inMilliseconds
-                                              .toDouble() -
-                                          100,
-                                      secondaryActiveColor:
-                                          Theme.of(context).colorScheme.surface,
-                                      allowedInteraction:
-                                          SliderInteraction.tapAndSlide,
-                                      value:
-                                          position.inMilliseconds.toDouble() -
-                                              100,
-                                      min: -100,
-                                      max: duration.inMilliseconds.toDouble(),
-                                      onChanged: (val) =>
-                                          context.read<PlayerBloc>().add(
-                                                PlayerSeek(
-                                                  Duration(
-                                                    milliseconds: val.toInt(),
-                                                  ),
-                                                ),
-                                              ),
-                                    ),
-                                  ),
-                                );
-                              });
-                        });
+                    if (!snapshot.hasData) return SizedBox();
+                    var mediaItem = snapshot.data;
+                    return RepaintBoundary(
+                      child: StreamBuilder<Duration?>(
+                          stream: _player.duration,
+                          builder: (context, snapshot) {
+                            var duration = snapshot.data ?? Duration.zero;
+                            return GestureDetector(
+                              onTapUp: (details) =>
+                                  _onVisualiserTap(details, duration),
+                              onPanUpdate: (details) =>
+                                  _onVisualiserUpdate(details, duration),
+                              child: Visualiser(
+                                url: mediaItem?.extras?['url'],
+                                width: MediaQuery.sizeOf(context).width * .83,
+                              ),
+                            );
+                          }),
+                    );
                   }),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 23),

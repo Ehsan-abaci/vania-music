@@ -29,8 +29,12 @@ import 'package:vania_music/features/music_album/domain/repository/music_album_r
 import 'package:vania_music/features/music_album/domain/usecases/get_music_album_usecase.dart';
 import 'package:vania_music/features/music_album/presentation/bloc/music_album/music_album_bloc.dart';
 import 'package:vania_music/features/player/data/repository/player_repositoryImpl.dart';
+import 'package:vania_music/features/player/data/repository/visualiser_repositoryImpl.dart';
 import 'package:vania_music/features/player/domain/repository/player_repository.dart';
+import 'package:vania_music/features/player/domain/repository/visualiser_repository.dart';
+import 'package:vania_music/features/player/domain/usecase/extract_waveform_usecase.dart';
 import 'package:vania_music/features/player/presentation/bloc/player/player_bloc.dart';
+import 'package:vania_music/features/player/presentation/bloc/visualiser/visualiser_cubit.dart';
 
 final di = GetIt.instance;
 
@@ -61,6 +65,8 @@ Future<void> initAppModule() async {
       () => MusicRepositoryImpl(di(), di(), di()));
   di.registerLazySingleton<FavoriteMusicRepository>(
       () => FavoriteMusicRepositoryImpl(di()));
+  di.registerLazySingleton<VisualiserRepository>(
+      () => VisualiserRepositoryImpl(di()));
 
   /// Usecases
   di.registerLazySingleton(() => GetMusicAlbumUseCase(di()));
@@ -68,14 +74,16 @@ Future<void> initAppModule() async {
   di.registerLazySingleton(() => AddFavoriteMusicUseCase(di()));
   di.registerLazySingleton(() => RemoveFavoriteMusicUseCase(di()));
   di.registerLazySingleton(() => GetFavoriteMusicUseCase(di()));
+  di.registerLazySingleton(() => ExtractWaveformUseCase(di()));
 
   /// Blocs
   di.registerLazySingleton(() => FavoriteBloc(di(), di(), di()));
   di.registerLazySingleton(() => MusicAlbumBloc(di()));
-  di.registerLazySingleton(() => MusicBloc(di(),di()));
+  di.registerLazySingleton(() => MusicBloc(di(), di()));
   di.registerLazySingleton(() => PlayerBloc(di()));
   di.registerLazySingleton(() => ThemeBloc(
       di<PlayerRepository>().currentMediaItemStreamController.stream));
+  di.registerLazySingleton(() => VisualiserCubit(di()));
 
   /// Value notifier
   di.registerLazySingleton(() => DownloadFile(di(), di(), di()));

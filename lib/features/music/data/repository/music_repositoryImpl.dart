@@ -21,11 +21,11 @@ class MusicRepositoryImpl extends MusicRepository {
   @override
   Future<DataState<List<MusicEntity>>> fetchMusics(String api) async {
     final bool isConnected = await networkInfo.isConnected;
-    if (await musicCache.isChachedMusics(api)) {
+    if (await musicCache.isChachedMusics(api) || !isConnected) {
       final res = musicCache.fetchMusicFromCache(api);
       return DataSuccess(res);
     }
-   else if (isConnected) {
+  else if (isConnected) {
       final response = await apiProvider.fetchMusics(api);
       if (response.statusCode == ResponseCode.SUCCESS) {
         final data = response.body;

@@ -41,7 +41,7 @@ class DownloadFile {
 
   void saveMusicInStorage({required String url, required String id}) async {
     log("*****Click Save music*****");
-    if (!await _fileManager.existedInLocal(url)) {
+    if (!_fileManager.existedInLocal(url)) {
       log("*****doesn't exist music*****");
 
       /// set url to download

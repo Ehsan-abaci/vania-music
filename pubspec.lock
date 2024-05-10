@@ -733,6 +733,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "13.0.0"
+  waveform_extractor:
+    dependency: "direct main"
+    description:
+      name: waveform_extractor
+      sha256: "6985aec78a6a773b5ad414d6150c23698babfdef6284749e93fb47074e3020e9"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.3"
   web:
     dependency: transitive
     description:
