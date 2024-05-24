@@ -36,6 +36,7 @@ class MusicBloc extends Bloc<MusicEvent, MusicState> {
       },
     );
     on<ChangeIsDownloadedEvent>((event, emit) {
+      log("change downloaded");
       final musics = (state as MusicCompletedState).musics.map((e) {
         if (e.id == event.id) return e.copyWith(isDownloaded: true);
         return e;

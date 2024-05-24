@@ -44,8 +44,6 @@ class FileManagerRepositoryImpl extends FileManagerRepository {
   @override
   Future<String?> existedInLocalStream(String url) async {
     while (true) {
-      log(url);
-      log(existedInLocal(url).toString());
       if (existedInLocal(url)) return CachedFile.filePathInLocal(url: url);
       await Future.delayed(const Duration(milliseconds: 500));
     }

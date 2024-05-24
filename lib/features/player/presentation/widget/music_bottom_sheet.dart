@@ -23,7 +23,7 @@ class MusicBottomSheet extends StatefulWidget {
 }
 
 class _MusicBottomSheetState extends State<MusicBottomSheet>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   Animation? _bottomSheetSizeAnimation;
   Animation? _imageAnimation;
   Animation? _leftMarginAnimation;
@@ -40,14 +40,83 @@ class _MusicBottomSheetState extends State<MusicBottomSheet>
   }
 
   @override
-  void didUpdateWidget(covariant MusicBottomSheet oldWidget) {
-    log("did change widget");
-    super.didUpdateWidget(oldWidget);
+  void initState() {
+    log("init state");
+    super.initState();
   }
 
   @override
   void didChangeDependencies() {
+    log("did change dep");
+
+    // bottomSheetSizeController?.addListener(() {
+    //   gradient = LinearGradient(
+    //     begin: Alignment.topCenter,
+    //     end: Alignment.bottomCenter,
+    //     stops: [
+    //       .5,
+    //       (bottomSheetSizeController!.isCompleted ? .7 : .1),
+    //       1,
+    //     ],
+    //     colors: [
+    //       Colors.black,
+    //       Colors.black,
+    //       Theme.of(context).colorScheme.background,
+    //     ],
+    //   );
+    // });
+
     super.didChangeDependencies();
+  }
+
+  _handleDragUpdate(DragUpdateDetails details) {
+    if (details.globalPosition.dy < 200) return;
+    bottomSheetSizeController?.value -= details.primaryDelta! / 800;
+  }
+
+  _handleDragEnd(DragEndDetails details) {
+    if (bottomSheetSizeController!.isAnimating ||
+        bottomSheetSizeController?.status == AnimationStatus.completed) return;
+
+    final flingVelocity = details.velocity.pixelsPerSecond.dy / 500;
+    if (flingVelocity < 0.0) {
+      bottomSheetSizeController?.fling(velocity: 2);
+    } else if (flingVelocity > 0.0) {
+      bottomSheetSizeController?.fling(velocity: -2);
+    } else {
+      bottomSheetSizeController?.fling(
+          velocity: bottomSheetSizeController!.value < 0.5 ? -2.0 : 2.0);
+    }
+  }
+
+  _onVisualiserTap(TapUpDetails details, Duration duration) {
+    var val =
+        ((details.localPosition.dx / MediaQuery.sizeOf(context).width * 1.2) *
+                duration.inMilliseconds)
+            .clamp(0, duration.inMilliseconds);
+    context.read<PlayerBloc>().add(PlayerSeek(
+          Duration(
+            milliseconds: val.toInt(),
+          ),
+        ));
+  }
+
+  _onVisualiserUpdate(DragUpdateDetails details, Duration duration) {
+    var val =
+        ((details.localPosition.dx / MediaQuery.sizeOf(context).width * 1.2) *
+                duration.inMilliseconds)
+            .clamp(0, duration.inMilliseconds);
+
+    context.read<PlayerBloc>().add(PlayerSeek(
+          Duration(
+            milliseconds: val.toInt(),
+          ),
+        ));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
     bottomSheetSizeController = bottomSheetSizeController ??
         AnimationController(
           vsync: this,
@@ -100,76 +169,10 @@ class _MusicBottomSheetState extends State<MusicBottomSheet>
         Theme.of(context).colorScheme.secondary,
       ],
     );
-
-    bottomSheetSizeController?.addListener(() {
-      gradient = LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        stops: [
-          .5,
-          (bottomSheetSizeController!.isCompleted ? .7 : .1),
-          1,
-        ],
-        colors: [
-          Colors.black,
-          Colors.black,
-          Theme.of(context).colorScheme.background,
-        ],
-      );
-    });
-
     _borderRadiusAnimation = _borderRadiusAnimation ??
         Tween<double>(begin: 10, end: 15).animate(CurvedAnimation(
             parent: bottomSheetSizeController!, curve: Curves.linear));
-  }
 
-  _handleDragUpdate(DragUpdateDetails details) {
-    if (details.globalPosition.dy < 200) return;
-    bottomSheetSizeController?.value -= details.primaryDelta! / 800;
-  }
-
-  _handleDragEnd(DragEndDetails details) {
-    if (bottomSheetSizeController!.isAnimating ||
-        bottomSheetSizeController?.status == AnimationStatus.completed) return;
-
-    final flingVelocity = details.velocity.pixelsPerSecond.dy / 500;
-    if (flingVelocity < 0.0) {
-      bottomSheetSizeController?.fling(velocity: 2);
-    } else if (flingVelocity > 0.0) {
-      bottomSheetSizeController?.fling(velocity: -2);
-    } else {
-      bottomSheetSizeController?.fling(
-          velocity: bottomSheetSizeController!.value < 0.5 ? -2.0 : 2.0);
-    }
-  }
-
-  _onVisualiserTap(TapUpDetails details, Duration duration) {
-    var val =
-        ((details.localPosition.dx / MediaQuery.sizeOf(context).width * 1.2) *
-                duration.inMilliseconds)
-            .clamp(0, duration.inMilliseconds);
-    context.read<PlayerBloc>().add(PlayerSeek(
-          Duration(
-            milliseconds: val.toInt(),
-          ),
-        ));
-  }
-
-  _onVisualiserUpdate(DragUpdateDetails details, Duration duration) {
-    var val =
-        ((details.localPosition.dx / MediaQuery.sizeOf(context).width * 1.2) *
-                duration.inMilliseconds)
-            .clamp(0, duration.inMilliseconds);
-
-    context.read<PlayerBloc>().add(PlayerSeek(
-          Duration(
-            milliseconds: val.toInt(),
-          ),
-        ));
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: bottomSheetSizeController!,
       builder: (context, child) => GestureDetector(
@@ -192,19 +195,21 @@ class _MusicBottomSheetState extends State<MusicBottomSheet>
               builder: (context, snapshot) {
                 if (!snapshot.hasData) return const SizedBox();
 
-                return Stack(
-                  children: [
-                    if (bottomSheetSizeController?.status ==
-                        AnimationStatus.dismissed)
-                      musicControler(),
-                    if (bottomSheetSizeController?.status ==
-                        AnimationStatus.completed)
-                      musicBar(),
-                    if (bottomSheetSizeController?.status ==
-                        AnimationStatus.completed)
-                      musicExtendedControler(),
-                    musicImage(),
-                  ],
+                return RepaintBoundary(
+                  child: Stack(
+                    children: [
+                      if (bottomSheetSizeController?.status ==
+                          AnimationStatus.dismissed)
+                        musicControler(),
+                      if (bottomSheetSizeController?.status ==
+                          AnimationStatus.completed)
+                        musicBar(),
+                      if (bottomSheetSizeController?.status ==
+                          AnimationStatus.completed)
+                        musicExtendedControler(),
+                      musicImage(),
+                    ],
+                  ),
                 );
               }),
         ),
@@ -605,12 +610,9 @@ class _MusicBottomSheetState extends State<MusicBottomSheet>
                             stream: _player.mediaItem,
                             builder: (context, snapshot) {
                               var currentItem = snapshot.data;
-
                               return RepaintBoundary(
                                 child: ElevatedButton(
                                   style: ElevatedButton.styleFrom(
-                                    // backgroundColor:
-                                    // Theme.of(context).colorScheme.,
                                     shape: const CircleBorder(),
                                     padding: EdgeInsets.zero,
                                     fixedSize: const Size.fromRadius(35),
@@ -657,6 +659,10 @@ class _MusicBottomSheetState extends State<MusicBottomSheet>
       ),
     );
   }
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 }
 
 class CustomIconButton extends StatelessWidget {

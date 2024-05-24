@@ -9,9 +9,6 @@ class PlayShuffleWidget extends StatelessWidget {
     return SliverAppBar(
       backgroundColor: Colors.black,
       surfaceTintColor: Colors.black,
-      
-      // backgroundColor: Theme.of(context).colorScheme.background,
-      // surfaceTintColor: Theme.of(context).colorScheme.background,
       automaticallyImplyLeading: false,
       pinned: true,
       primary: false,
@@ -37,7 +34,7 @@ class PlayShuffleWidget extends StatelessWidget {
                       foregroundColor: Colors.white,
                     ),
                     onPressed: () {},
-                    child: Row(
+                    child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(Icons.play_circle_outline_rounded),

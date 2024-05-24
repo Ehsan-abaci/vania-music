@@ -11,15 +11,17 @@ class MaterialAppRoot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ThemeBloc, ThemeState>(
+      buildWhen: (previous, current) => previous != current,
       builder: (context, state) {
         ThemeData? currentTheme;
         if (state is ThemeComplete) currentTheme = state.theme;
         if (state is ThemeInitial) currentTheme = state.theme;
         log("build theme");
         return MaterialApp.router(
-            debugShowCheckedModeBanner: false,
-            routerConfig: RouteGenerator.router,
-            theme: currentTheme);
+          debugShowCheckedModeBanner: false,
+          routerConfig: RouteGenerator.router,
+          theme: currentTheme,
+        );
       },
     );
   }

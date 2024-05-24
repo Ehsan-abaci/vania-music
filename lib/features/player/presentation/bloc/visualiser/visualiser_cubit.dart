@@ -25,7 +25,6 @@ class VisualiserCubit extends Cubit<VisualiserState> {
     try {
       DataState dataState = await extractWaveformUseCase(url);
       if (dataState is DataSuccess) {
-   log(dataState.data.length.toString());
           emit(VisualiserComplete(downscaledWaveformList: dataState.data));
       } else {}
     } catch (e) {

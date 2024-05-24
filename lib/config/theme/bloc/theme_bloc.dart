@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
@@ -23,14 +24,16 @@ class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
 
         final primarySwatchColor =
             generateMaterialColor(color: palatte.dominantColor!.color);
-
-        emit(
-          ThemeComplete(
-            ThemeConfig.newTheme(primarySwatchColor),
-          ),
-        );
+        add(ChangeThemeEvent(primarySwatchColor));
       },
     );
+    on<ChangeThemeEvent>((event, emit) {
+      emit(
+        ThemeComplete(
+          ThemeConfig.newTheme(event.primarySwatchColor),
+        ),
+      );
+    });
   }
   @override
   Future<void> close() {

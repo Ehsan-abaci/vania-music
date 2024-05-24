@@ -147,7 +147,6 @@ class _MusicListTileState extends State<MusicListTile> {
                           ),
                         );
                   },
-                  // tileColor: Colors.grey.shade50,
                   leading: StreamBuilder<MediaItem?>(
                       stream: widget._player.mediaItem,
                       builder: (context, snapshot) {

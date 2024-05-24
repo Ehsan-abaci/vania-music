@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -44,6 +45,7 @@ class RouteGenerator {
               stream: di<PlayerRepository>().mediaItem,
               builder: (ctx, snapshot) {
                 if (snapshot.hasData) {
+                  log("routes build");
                   return MusicBottomSheet();
                 } else {
                   return const SizedBox();

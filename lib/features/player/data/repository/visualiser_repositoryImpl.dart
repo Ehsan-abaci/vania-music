@@ -24,15 +24,12 @@ class VisualiserRepositoryImpl extends VisualiserRepository {
         .existedInLocalStream(source)
         .then((filePath) async {
       if (filePath != null) {
-        log(filePath);
         _currentWaveform = await _waveformExtractor.extractWaveform(filePath);
       }
     });
-    log(" length in repositoryyyyyyyy ${_currentWaveform?.waveformData.length}");
 
     final updatedDownScaledList = _updateDownscaledList(
         _currentWaveform?.waveformData, _downscaledTargetSize);
-    log(" length in repository ${updatedDownScaledList.length}");
     return DataSuccess(updatedDownScaledList);
   }
 

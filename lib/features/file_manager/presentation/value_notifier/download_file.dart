@@ -49,8 +49,7 @@ class DownloadFile {
       final key = getUrlSuffix(url);
 
       downloadStatus.value = DownloadStatus.downloading;
-      await _downloadFile(url: url, path: '$dirPath/$key')
-          .then((dataState) async {
+      _downloadFile(url: url, path: '$dirPath/$key').then((dataState) async {
         final storedPath = dataState.data;
         if (dataState is DataSuccess) {
           downloadStatus.value = DownloadStatus.downloaded;
@@ -75,6 +74,7 @@ class DownloadFile {
     await _fileManager.file!
         .writeAsBytes(music, flush: true)
         .then((value) => log("Saved in ${value.path}"));
+    musicBloc.add(ChangeIsDownloadedEvent(id));
 
     // await file.copy(_fileManager.file!.path);
   }

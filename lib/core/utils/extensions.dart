@@ -1,6 +1,5 @@
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:vania_music/features/music/data/model/music_model.dart';
-import 'package:vania_music/features/music/domain/entities/music_entity.dart';
 
 extension ToHMS on Duration {
   String toHms() {

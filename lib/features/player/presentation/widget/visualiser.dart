@@ -37,6 +37,7 @@ class _VisualiserState extends State<Visualiser>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return StreamBuilder<MediaItem?>(
         stream: di<PlayerRepository>().mediaItem,
         builder: (context, snapshot) {
