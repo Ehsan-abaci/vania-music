@@ -114,7 +114,7 @@ class _MusicListTileState extends State<MusicListTile> {
     await showDialog(
       barrierDismissible: false,
       context: context,
-      builder: (context) => DownloadDialog(),
+      builder: (context) => const DownloadDialog(),
     );
   }
 

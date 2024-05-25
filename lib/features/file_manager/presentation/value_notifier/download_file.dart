@@ -53,7 +53,6 @@ class DownloadFile {
         final storedPath = dataState.data;
         if (dataState is DataSuccess) {
           downloadStatus.value = DownloadStatus.downloaded;
-          musicBloc.add(ChangeIsDownloadedEvent(id));
         } else if (dataState is DataFailed) {
           downloadStatus.value = DownloadStatus.error;
           return;

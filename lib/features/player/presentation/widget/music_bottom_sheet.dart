@@ -1,11 +1,9 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:vania_music/config/theme/bloc/theme_bloc.dart';
 import 'package:vania_music/core/utils/extensions.dart';
-import 'package:vania_music/core/utils/resources/color_manager.dart';
 import 'package:vania_music/features/favorite/presentation/bloc/favorite/favorite_bloc.dart';
 import 'package:vania_music/features/favorite/presentation/bloc/favorite/fm_status.dart';
 import 'package:vania_music/features/player/domain/repository/player_repository.dart';
@@ -30,7 +28,8 @@ class _MusicBottomSheetState extends State<MusicBottomSheet>
   Animation? _topMarginAnimation;
   Animation? _borderRadiusAnimation;
   Animation? _opacityAnimation;
-  Gradient? gradient;
+  Gradient? startGradient;
+  Gradient? endGradient;
 
   final PlayerRepository _player = di<PlayerRepository>();
   @override
@@ -48,23 +47,70 @@ class _MusicBottomSheetState extends State<MusicBottomSheet>
   @override
   void didChangeDependencies() {
     log("did change dep");
+    bottomSheetSizeController = bottomSheetSizeController ??
+        AnimationController(
+          vsync: this,
+          duration: const Duration(milliseconds: 300),
+        );
+    _bottomSheetSizeAnimation = _bottomSheetSizeAnimation ??
+        Tween<double>(
+          begin: 70,
+          end: MediaQuery.sizeOf(context).height - 50,
+        ).animate(
+          CurvedAnimation(
+            parent: bottomSheetSizeController!,
+            curve: Curves.linear,
+          ),
+        );
+    _opacityAnimation = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(
+        parent: bottomSheetSizeController!,
+        curve: Curves.linear,
+      ),
+    );
+   
+    _leftMarginAnimation = _leftMarginAnimation ??
+        Tween<double>(begin: 0, end: 70).animate(
+          CurvedAnimation(
+              parent: bottomSheetSizeController!, curve: Curves.linear),
+        );
 
-    // bottomSheetSizeController?.addListener(() {
-    //   gradient = LinearGradient(
-    //     begin: Alignment.topCenter,
-    //     end: Alignment.bottomCenter,
-    //     stops: [
-    //       .5,
-    //       (bottomSheetSizeController!.isCompleted ? .7 : .1),
-    //       1,
-    //     ],
-    //     colors: [
-    //       Colors.black,
-    //       Colors.black,
-    //       Theme.of(context).colorScheme.background,
-    //     ],
-    //   );
-    // });
+    _topMarginAnimation = _topMarginAnimation ??
+        Tween<double>(begin: 0, end: 60).animate(
+          CurvedAnimation(
+              parent: bottomSheetSizeController!, curve: Curves.linear),
+        );
+    final state = context.watch<ThemeBloc>().state;
+    late Color? color;
+    if (state is ThemeInitial) color = state.theme?.colorScheme.primary;
+    if (state is ThemeComplete) color = state.theme?.colorScheme.primary;
+    startGradient = LinearGradient(
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+      stops: const [
+        .1,
+        .4,
+        .9,
+      ],
+      colors: [Colors.black, Colors.black, color ?? Colors.black],
+    );
+    endGradient = LinearGradient(
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+      stops: const [
+        .1,
+        .7,
+        .9,
+      ],
+      colors: [
+        Colors.black,
+        Colors.black,
+        color ?? Colors.black,
+      ],
+    );
+    _borderRadiusAnimation = _borderRadiusAnimation ??
+        Tween<double>(begin: 10, end: 15).animate(CurvedAnimation(
+            parent: bottomSheetSizeController!, curve: Curves.linear));
 
     super.didChangeDependencies();
   }
@@ -117,62 +163,13 @@ class _MusicBottomSheetState extends State<MusicBottomSheet>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    bottomSheetSizeController = bottomSheetSizeController ??
-        AnimationController(
-          vsync: this,
-          duration: const Duration(milliseconds: 300),
-        );
-    _bottomSheetSizeAnimation = _bottomSheetSizeAnimation ??
-        Tween<double>(
-          begin: 70,
-          end: MediaQuery.sizeOf(context).height - 50,
-        ).animate(
-          CurvedAnimation(
-            parent: bottomSheetSizeController!,
-            curve: Curves.linear,
-          ),
-        );
-    _opacityAnimation = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(
-        parent: bottomSheetSizeController!,
-        curve: Curves.linear,
-      ),
-    );
-    _imageAnimation = _imageAnimation ??
-        Tween<double>(begin: 50, end: 200).animate(
+    log("build widget");
+ _imageAnimation = 
+        Tween<double>(begin: 50, end: MediaQuery.sizeOf(context).height * .3).animate(
           CurvedAnimation(
               parent: bottomSheetSizeController!,
               curve: Curves.linearToEaseOut),
         );
-    _leftMarginAnimation = _leftMarginAnimation ??
-        Tween<double>(begin: 0, end: 70).animate(
-          CurvedAnimation(
-              parent: bottomSheetSizeController!, curve: Curves.linear),
-        );
-
-    _topMarginAnimation = _topMarginAnimation ??
-        Tween<double>(begin: 0, end: 60).animate(
-          CurvedAnimation(
-              parent: bottomSheetSizeController!, curve: Curves.linear),
-        );
-    gradient = LinearGradient(
-      begin: Alignment.topCenter,
-      end: Alignment.bottomCenter,
-      stops: [
-        .1,
-        (bottomSheetSizeController!.isCompleted ? .75 : .4),
-        .9,
-      ],
-      colors: [
-        Colors.black,
-        Colors.black,
-        Theme.of(context).colorScheme.secondary,
-      ],
-    );
-    _borderRadiusAnimation = _borderRadiusAnimation ??
-        Tween<double>(begin: 10, end: 15).animate(CurvedAnimation(
-            parent: bottomSheetSizeController!, curve: Curves.linear));
-
     return AnimatedBuilder(
       animation: bottomSheetSizeController!,
       builder: (context, child) => GestureDetector(
@@ -184,7 +181,9 @@ class _MusicBottomSheetState extends State<MusicBottomSheet>
           height: _bottomSheetSizeAnimation?.value,
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
           decoration: BoxDecoration(
-            gradient: gradient,
+            gradient: bottomSheetSizeController!.isCompleted
+                ? endGradient
+                : startGradient,
             borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(25),
               topRight: Radius.circular(25),
@@ -388,6 +387,7 @@ class _MusicBottomSheetState extends State<MusicBottomSheet>
           top: _topMarginAnimation?.value,
           child: RepaintBoundary(
             child: FittedBox(
+              fit: BoxFit.scaleDown,
               child: Container(
                 width: _imageAnimation?.value,
                 height: _imageAnimation?.value,
@@ -661,7 +661,6 @@ class _MusicBottomSheetState extends State<MusicBottomSheet>
   }
 
   @override
-  // TODO: implement wantKeepAlive
   bool get wantKeepAlive => true;
 }
 
