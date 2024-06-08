@@ -35,6 +35,31 @@ class _VisualiserState extends State<Visualiser>
     context.read<VisualiserCubit>().excuteWaveExtractor(widget.url);
   }
 
+  _onVisualiserTap(TapUpDetails details, Duration duration) {
+    var val =
+        ((details.localPosition.dx / MediaQuery.sizeOf(context).width * 1.2) *
+                duration.inMilliseconds)
+            .clamp(0, duration.inMilliseconds);
+    context.read<PlayerBloc>().add(PlayerSeek(
+          Duration(
+            milliseconds: val.toInt(),
+          ),
+        ));
+  }
+
+  _onVisualiserUpdate(DragUpdateDetails details, Duration duration) {
+    var val =
+        ((details.localPosition.dx / MediaQuery.sizeOf(context).width * 1.2) *
+                duration.inMilliseconds)
+            .clamp(0, duration.inMilliseconds);
+
+    context.read<PlayerBloc>().add(PlayerSeek(
+          Duration(
+            milliseconds: val.toInt(),
+          ),
+        ));
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -55,47 +80,53 @@ class _VisualiserState extends State<Visualiser>
                           : (position.inMilliseconds /
                                   duration.inMilliseconds) *
                               100;
-                      return Container(
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(24.0)),
-                        width: widget.width,
-                        child: BlocBuilder<VisualiserCubit, VisualiserState>(
-                          builder: (context, state) {
-                            if (state is VisualiserComplete) {
-                              _downscaledWaveformList =
-                                  state.downscaledWaveformList;
-                            } else if (state is VisualiserInitial) {
-                              _downscaledWaveformList =
-                                  state.downscaledWaveformList;
-                            }
-                      
-                            return Row(
-                              mainAxisAlignment:
-                                  MainAxisAlignment.spaceEvenly,
-                              mainAxisSize: MainAxisSize.max,
-                              children: [
-                                ...List.generate(
-                                  _downscaledWaveformList.length,
-                                  (i) {
-                                    var e = _downscaledWaveformList[i];
-                                    return AnimatedContainer(
-                                      duration:
-                                          const Duration(milliseconds: 300),
-                                      decoration: BoxDecoration(
-                                          color: value.toInt() >= i
-                                              // ? Theme.of(context).colorScheme.onSecondary
-                                              ? Colors.grey.shade700
-                                              : Colors.white70,
-                                          borderRadius:
-                                              BorderRadius.circular(6.0)),
-                                      height: (e).clamp(1.0, 50),
-                                      width: _barWidth,
-                                    );
-                                  },
-                                ),
-                              ],
-                            );
-                          },
+                      return GestureDetector(
+                        onTapUp: (details) =>
+                            _onVisualiserTap(details, duration),
+                        onPanUpdate: (details) =>
+                            _onVisualiserUpdate(details, duration),
+                        child: Container(
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(24.0)),
+                          width: widget.width,
+                          child: BlocBuilder<VisualiserCubit, VisualiserState>(
+                            builder: (context, state) {
+                              if (state is VisualiserComplete) {
+                                _downscaledWaveformList =
+                                    state.downscaledWaveformList;
+                              } else if (state is VisualiserInitial) {
+                                _downscaledWaveformList =
+                                    state.downscaledWaveformList;
+                              }
+
+                              return Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                mainAxisSize: MainAxisSize.max,
+                                children: [
+                                  ...List.generate(
+                                    _downscaledWaveformList.length,
+                                    (i) {
+                                      var e = _downscaledWaveformList[i];
+                                      return AnimatedContainer(
+                                        duration:
+                                            const Duration(milliseconds: 300),
+                                        decoration: BoxDecoration(
+                                            color: value.toInt() >= i
+                                                // ? Theme.of(context).colorScheme.onSecondary
+                                                ? Colors.grey.shade700
+                                                : Colors.white70,
+                                            borderRadius:
+                                                BorderRadius.circular(6.0)),
+                                        height: (e).clamp(1.0, 50),
+                                        width: _barWidth,
+                                      );
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
                         ),
                       );
                     });

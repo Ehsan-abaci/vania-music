@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio_background/just_audio_background.dart';
@@ -68,7 +69,7 @@ class _MusicBottomSheetState extends State<MusicBottomSheet>
         curve: Curves.linear,
       ),
     );
-   
+
     _leftMarginAnimation = _leftMarginAnimation ??
         Tween<double>(begin: 0, end: 70).animate(
           CurvedAnimation(
@@ -135,41 +136,16 @@ class _MusicBottomSheetState extends State<MusicBottomSheet>
     }
   }
 
-  _onVisualiserTap(TapUpDetails details, Duration duration) {
-    var val =
-        ((details.localPosition.dx / MediaQuery.sizeOf(context).width * 1.2) *
-                duration.inMilliseconds)
-            .clamp(0, duration.inMilliseconds);
-    context.read<PlayerBloc>().add(PlayerSeek(
-          Duration(
-            milliseconds: val.toInt(),
-          ),
-        ));
-  }
-
-  _onVisualiserUpdate(DragUpdateDetails details, Duration duration) {
-    var val =
-        ((details.localPosition.dx / MediaQuery.sizeOf(context).width * 1.2) *
-                duration.inMilliseconds)
-            .clamp(0, duration.inMilliseconds);
-
-    context.read<PlayerBloc>().add(PlayerSeek(
-          Duration(
-            milliseconds: val.toInt(),
-          ),
-        ));
-  }
-
   @override
   Widget build(BuildContext context) {
     super.build(context);
     log("build widget");
- _imageAnimation = 
-        Tween<double>(begin: 50, end: MediaQuery.sizeOf(context).height * .3).animate(
-          CurvedAnimation(
-              parent: bottomSheetSizeController!,
-              curve: Curves.linearToEaseOut),
-        );
+    _imageAnimation =
+        Tween<double>(begin: 50, end: MediaQuery.sizeOf(context).height * .3)
+            .animate(
+      CurvedAnimation(
+          parent: bottomSheetSizeController!, curve: Curves.linearToEaseOut),
+    );
     return AnimatedBuilder(
       animation: bottomSheetSizeController!,
       builder: (context, child) => GestureDetector(
@@ -411,9 +387,11 @@ class _MusicBottomSheetState extends State<MusicBottomSheet>
                   child: StreamBuilder<MediaItem?>(
                       stream: _player.mediaItem,
                       builder: (context, snapshot) {
-                        return Image.network(
-                          snapshot.data?.extras?['img'] ?? '',
-                          errorBuilder: (context, error, stackTrace) =>
+                        return CachedNetworkImage(
+                          imageUrl: snapshot.data?.extras?['img'] ?? '',
+                          placeholder: (context, url) =>
+                              CircularProgressIndicator(),
+                          errorWidget: (context, url, error) =>
                               const AspectRatio(
                             aspectRatio: 1.7,
                             child: FittedBox(
@@ -427,6 +405,22 @@ class _MusicBottomSheetState extends State<MusicBottomSheet>
                             ),
                           ),
                         );
+                        // return Image.network(
+                        //   snapshot.data?.extras?['img'] ?? '',
+                        //   errorBuilder: (context, error, stackTrace) =>
+                        //       const AspectRatio(
+                        //     aspectRatio: 1.7,
+                        //     child: FittedBox(
+                        //       child: Text(
+                        //         "Vania\nMusic",
+                        //         style: TextStyle(
+                        //           color: Colors.white,
+                        //         ),
+                        //         textAlign: TextAlign.center,
+                        //       ),
+                        //     ),
+                        //   ),
+                        // );
                       }),
                 ),
               ),
@@ -537,24 +531,13 @@ class _MusicBottomSheetState extends State<MusicBottomSheet>
               StreamBuilder<MediaItem?>(
                   stream: _player.mediaItem,
                   builder: (context, snapshot) {
-                    if (!snapshot.hasData) return SizedBox();
+                    if (!snapshot.hasData) return const SizedBox();
                     var mediaItem = snapshot.data;
                     return RepaintBoundary(
-                      child: StreamBuilder<Duration?>(
-                          stream: _player.duration,
-                          builder: (context, snapshot) {
-                            var duration = snapshot.data ?? Duration.zero;
-                            return GestureDetector(
-                              onTapUp: (details) =>
-                                  _onVisualiserTap(details, duration),
-                              onPanUpdate: (details) =>
-                                  _onVisualiserUpdate(details, duration),
-                              child: Visualiser(
-                                url: mediaItem?.extras?['url'],
-                                width: MediaQuery.sizeOf(context).width * .83,
-                              ),
-                            );
-                          }),
+                      child: Visualiser(
+                        url: mediaItem?.extras?['url'],
+                        width: MediaQuery.sizeOf(context).width * .83,
+                      ),
                     );
                   }),
               Padding(
