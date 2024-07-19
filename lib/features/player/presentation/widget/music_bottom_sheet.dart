@@ -1,10 +1,17 @@
 import 'dart:developer';
+import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:vania_music/config/theme/bloc/theme_bloc.dart';
 import 'package:vania_music/core/utils/extensions.dart';
+import 'package:vania_music/core/utils/resources/assets_manager.dart';
+import 'package:vania_music/core/utils/resources/color_manager.dart';
+import 'package:vania_music/core/widgets/svg_button.dart';
 import 'package:vania_music/features/favorite/presentation/bloc/favorite/favorite_bloc.dart';
 import 'package:vania_music/features/favorite/presentation/bloc/favorite/fm_status.dart';
 import 'package:vania_music/features/player/domain/repository/player_repository.dart';
@@ -71,7 +78,7 @@ class _MusicBottomSheetState extends State<MusicBottomSheet>
     );
 
     _leftMarginAnimation = _leftMarginAnimation ??
-        Tween<double>(begin: 0, end: 70).animate(
+        Tween<double>(begin: 10, end: 70).animate(
           CurvedAnimation(
               parent: bottomSheetSizeController!, curve: Curves.linear),
         );
@@ -93,7 +100,7 @@ class _MusicBottomSheetState extends State<MusicBottomSheet>
         .4,
         .9,
       ],
-      colors: [Colors.black, Colors.black, color ?? Colors.black],
+      colors: [ColorManager.bg, ColorManager.bg, color ?? ColorManager.bg],
     );
     endGradient = LinearGradient(
       begin: Alignment.topCenter,
@@ -104,9 +111,9 @@ class _MusicBottomSheetState extends State<MusicBottomSheet>
         .9,
       ],
       colors: [
-        Colors.black,
-        Colors.black,
-        color ?? Colors.black,
+        ColorManager.bg,
+        ColorManager.bg,
+        color ?? ColorManager.bg,
       ],
     );
     _borderRadiusAnimation = _borderRadiusAnimation ??
@@ -155,16 +162,17 @@ class _MusicBottomSheetState extends State<MusicBottomSheet>
         child: Container(
           width: double.infinity,
           height: _bottomSheetSizeAnimation?.value,
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-          decoration: BoxDecoration(
-            gradient: bottomSheetSizeController!.isCompleted
-                ? endGradient
-                : startGradient,
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(25),
-              topRight: Radius.circular(25),
-            ),
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+          color: ColorManager.bg,
+          // decoration: BoxDecoration(
+          //   gradient: bottomSheetSizeController!.isCompleted
+          //       ? endGradient
+          //       : startGradient,
+          //   borderRadius: const BorderRadius.only(
+          //     topLeft: Radius.circular(25),
+          //     topRight: Radius.circular(25),
+          //   ),
+          // ),
           child: StreamBuilder<MediaItem?>(
               stream: _player.mediaItem,
               builder: (context, snapshot) {
@@ -173,6 +181,9 @@ class _MusicBottomSheetState extends State<MusicBottomSheet>
                 return RepaintBoundary(
                   child: Stack(
                     children: [
+                      if (bottomSheetSizeController?.status ==
+                          AnimationStatus.completed)
+                        bgImage(),
                       if (bottomSheetSizeController?.status ==
                           AnimationStatus.dismissed)
                         musicControler(),
@@ -192,13 +203,26 @@ class _MusicBottomSheetState extends State<MusicBottomSheet>
     );
   }
 
+  Widget bgImage() {
+    return Positioned(
+      bottom: 0,
+      right: 0,
+      left: 0,
+      child: Image.asset(
+        "assets/img_blur_bg.png",
+        color: Theme.of(context).colorScheme.secondary,
+        fit: BoxFit.fitHeight,
+      ),
+    );
+  }
+
   Widget musicBar() {
     return Positioned(
       left: 0,
       right: 0,
       top: 0,
       child: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.transparent,
         leading: IconButton(
           onPressed: bottomSheetSizeController?.reverse,
           icon: const Icon(
@@ -233,7 +257,7 @@ class _MusicBottomSheetState extends State<MusicBottomSheet>
   Widget musicControler() {
     return Positioned(
       right: 70,
-      left: 0,
+      left: 10,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -263,7 +287,7 @@ class _MusicBottomSheetState extends State<MusicBottomSheet>
                                     );
                               } else {
                                 context.read<PlayerBloc>().add(
-                                      PlayerPlay(id: currentItem?.id),
+                                      PlayerPlay(id: currentItem!.id),
                                     );
                               }
                             },
@@ -301,20 +325,15 @@ class _MusicBottomSheetState extends State<MusicBottomSheet>
                                     .any(
                                       (e) => e.id == currentMusic!.id,
                                     )
-                                ? Icon(
-                                    Icons.favorite_rounded,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSecondary,
-                                    size: 30,
-                                  )
+                                ? const Icon(Icons.favorite_rounded,
+                                    color: Colors.white)
                                 : const Icon(
                                     Icons.favorite_border_rounded,
                                     color: Colors.grey,
                                   );
                           }
 
-                          return SizedBox();
+                          return const SizedBox();
                         },
                       ),
                       color: Colors.grey,
@@ -371,15 +390,14 @@ class _MusicBottomSheetState extends State<MusicBottomSheet>
                 decoration: BoxDecoration(
                   borderRadius:
                       BorderRadius.circular(_borderRadiusAnimation?.value),
-                  boxShadow: const [
+                  boxShadow: [
                     BoxShadow(
-                      color: Color.fromARGB(44, 2, 2, 2),
-                      spreadRadius: 0,
-                      blurRadius: 20,
-                      offset: Offset(0, 20),
-                    ),
+                      color: Theme.of(context).colorScheme.secondary,
+                      blurRadius: 25,
+                      offset: const Offset(0, 5),
+                    )
                   ],
-                  color: Colors.black,
+                  color: ColorManager.bg,
                 ),
                 child: ClipRRect(
                   borderRadius:
@@ -390,7 +408,7 @@ class _MusicBottomSheetState extends State<MusicBottomSheet>
                         return CachedNetworkImage(
                           imageUrl: snapshot.data?.extras?['img'] ?? '',
                           placeholder: (context, url) =>
-                              CircularProgressIndicator(),
+                              const CircularProgressIndicator(),
                           errorWidget: (context, url, error) =>
                               const AspectRatio(
                             aspectRatio: 1.7,
@@ -405,22 +423,6 @@ class _MusicBottomSheetState extends State<MusicBottomSheet>
                             ),
                           ),
                         );
-                        // return Image.network(
-                        //   snapshot.data?.extras?['img'] ?? '',
-                        //   errorBuilder: (context, error, stackTrace) =>
-                        //       const AspectRatio(
-                        //     aspectRatio: 1.7,
-                        //     child: FittedBox(
-                        //       child: Text(
-                        //         "Vania\nMusic",
-                        //         style: TextStyle(
-                        //           color: Colors.white,
-                        //         ),
-                        //         textAlign: TextAlign.center,
-                        //       ),
-                        //     ),
-                        //   ),
-                        // );
                       }),
                 ),
               ),
@@ -448,77 +450,8 @@ class _MusicBottomSheetState extends State<MusicBottomSheet>
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    StreamBuilder<MediaItem?>(
-                        stream: _player.mediaItem,
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData) return const SizedBox();
-                          final currentMusic = snapshot.data;
-                          return RepaintBoundary(
-                            child: IconButton(
-                              onPressed: () => context.read<FavoriteBloc>().add(
-                                  ToggleFavorite(
-                                      music: snapshot.data.toMusic())),
-                              icon: BlocBuilder<FavoriteBloc, FavoriteState>(
-                                buildWhen: (previous, current) {
-                                  if (previous.tfStatus == current.tfStatus) {
-                                    return false;
-                                  }
-                                  return true;
-                                },
-                                builder: (context, state) {
-                                  if (state.fmStatus is FmCompelete) {
-                                    return (state.fmStatus as FmCompelete)
-                                            .favoriteMusics
-                                            .any(
-                                                (e) => e.id == currentMusic!.id)
-                                        ? Icon(
-                                            Icons.favorite_rounded,
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .onSecondary,
-                                            size: 30,
-                                          )
-                                        : const Icon(
-                                            Icons.favorite_border_rounded,
-                                            color: Colors.grey,
-                                          );
-                                  }
-
-                                  return SizedBox();
-                                },
-                              ),
-                              color: Colors.grey,
-                            ),
-                          );
-                        }),
-                    StreamBuilder<int?>(
-                        stream: _player.currentIndexStream,
-                        builder: (context, snapshot) {
-                          var mediaItem = _player.mediaItems[
-                              snapshot.data ?? _player.currentIndex];
-                          return Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                FittedBox(
-                                  child: Text(
-                                    mediaItem.title,
-                                    softWrap: true,
-                                    style: const TextStyle(
-                                        fontSize: 30,
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w700),
-                                  ),
-                                ),
-                                Text(
-                                  mediaItem.artist!,
-                                  style: const TextStyle(
-                                      fontSize: 16, color: Colors.grey),
-                                ),
-                              ],
-                            ),
-                          );
-                        }),
+                    _getToggleFavoriteButton(),
+                    _getName(),
                     CustomIconButton(
                       onPressed: () {},
                       icon: const Icon(Icons.more_horiz_rounded),
@@ -528,118 +461,225 @@ class _MusicBottomSheetState extends State<MusicBottomSheet>
                 ),
               ),
               const SizedBox(height: 20),
-              StreamBuilder<MediaItem?>(
-                  stream: _player.mediaItem,
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) return const SizedBox();
-                    var mediaItem = snapshot.data;
-                    return RepaintBoundary(
-                      child: Visualiser(
-                        url: mediaItem?.extras?['url'],
-                        width: MediaQuery.sizeOf(context).width * .83,
-                      ),
-                    );
-                  }),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 23),
-                child: RepaintBoundary(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      StreamBuilder<Duration>(
-                          stream: _player.position,
-                          builder: (context, snapshot) {
-                            var currentPosition =
-                                snapshot.data ?? Duration.zero;
-                            return Text(
-                              currentPosition.toHms(),
-                            );
-                          }),
-                      StreamBuilder<Duration?>(
-                          stream: _player.duration,
-                          builder: (context, snapshot) {
-                            var duration = snapshot.data ?? Duration.zero;
-                            return Text(
-                              duration.toHms(),
-                              style: const TextStyle(color: Colors.grey),
-                            );
-                          }),
-                    ],
-                  ),
-                ),
-              ),
+              ..._getVisualiser(),
               const SizedBox(height: 20),
+              //! controller of player
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  IconButton(
-                    onPressed: () {},
-                    color: Colors.white,
-                    icon: const Icon(Icons.shuffle),
-                  ),
-                  IconButton(
-                    onPressed: () =>
-                        context.read<PlayerBloc>().add(PlayerPrevious()),
-                    color: Colors.white,
-                    icon: const Icon(Icons.skip_previous_rounded),
-                    iconSize: 40,
-                  ),
-                  StreamBuilder<bool>(
-                      stream: _player.playing,
-                      builder: (context, snapshot) {
-                        var isPlaying = snapshot.data ?? false;
-                        return StreamBuilder<MediaItem?>(
-                            stream: _player.mediaItem,
-                            builder: (context, snapshot) {
-                              var currentItem = snapshot.data;
-                              return RepaintBoundary(
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    shape: const CircleBorder(),
-                                    padding: EdgeInsets.zero,
-                                    fixedSize: const Size.fromRadius(35),
-                                  ),
-                                  onPressed: () {
-                                    if (isPlaying) {
-                                      context.read<PlayerBloc>().add(
-                                            PlayerPause(),
-                                          );
-                                    } else {
-                                      context.read<PlayerBloc>().add(
-                                            PlayerPlay(id: currentItem?.id),
-                                          );
-                                    }
-                                  },
-                                  child: Icon(
-                                    isPlaying
-                                        ? Icons.pause
-                                        : Icons.play_arrow_rounded,
-                                    size: 35,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              );
-                            });
-                      }),
-                  IconButton(
-                    onPressed: () =>
-                        context.read<PlayerBloc>().add(PlayerNext()),
-                    color: Colors.white,
-                    icon: Icon(Icons.skip_next_rounded),
-                    iconSize: 40,
-                  ),
-                  IconButton(
-                    onPressed: () {},
-                    color: Colors.grey,
-                    icon: Icon(Icons.repeat),
-                  ),
+                  _getShuffleButton(),
+                  _getPlayPreviousButton(),
+                  _getPlayAndPauseButton(),
+                  _getPlayNextButton(),
+                  _getRepeatButton(),
                 ],
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  StreamBuilder<int?> _getName() {
+    return StreamBuilder<int?>(
+        stream: _player.currentIndexStream,
+        builder: (context, snapshot) {
+          var mediaItem =
+              _player.mediaItems[snapshot.data ?? _player.currentIndex];
+          return Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                FittedBox(
+                  child: Text(
+                    mediaItem.title,
+                    softWrap: true,
+                    style: const TextStyle(
+                        fontSize: 30,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700),
+                  ),
+                ),
+                Text(
+                  mediaItem.artist!,
+                  style: const TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+              ],
+            ),
+          );
+        });
+  }
+
+  StreamBuilder<MediaItem?> _getToggleFavoriteButton() {
+    return StreamBuilder<MediaItem?>(
+        stream: _player.mediaItem,
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) return const SizedBox();
+          final currentMusic = snapshot.data;
+          return RepaintBoundary(
+            child: IconButton(
+              onPressed: () => context.read<FavoriteBloc>().add(
+                    ToggleFavorite(
+                      music: snapshot.data.toMusic(),
+                    ),
+                  ),
+              icon: BlocBuilder<FavoriteBloc, FavoriteState>(
+                buildWhen: (previous, current) {
+                  if (previous.tfStatus == current.tfStatus) {
+                    return false;
+                  }
+                  return true;
+                },
+                builder: (context, state) {
+                  if (state.fmStatus is FmCompelete) {
+                    return (state.fmStatus as FmCompelete)
+                            .favoriteMusics
+                            .any((e) => e.id == currentMusic!.id)
+                        ? const Icon(
+                            Icons.favorite_rounded,
+                            color: Colors.white,
+                          )
+                        : const Icon(
+                            Icons.favorite_border_rounded,
+                            color: Colors.white,
+                          );
+                  }
+
+                  return const SizedBox();
+                },
+              ),
+              color: Colors.grey,
+            ),
+          );
+        });
+  }
+
+  List<Widget> _getVisualiser() {
+    return [
+      StreamBuilder<MediaItem?>(
+          stream: _player.mediaItem,
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) return const SizedBox();
+            var mediaItem = snapshot.data;
+            return RepaintBoundary(
+              child: Visualiser(
+                url: mediaItem?.extras?['url'],
+                width: MediaQuery.sizeOf(context).width * .83,
+              ),
+            );
+          }),
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 23),
+        child: RepaintBoundary(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              StreamBuilder<Duration>(
+                  stream: _player.position,
+                  builder: (context, snapshot) {
+                    var currentPosition = snapshot.data ?? Duration.zero;
+                    return Text(
+                      currentPosition.toHms(),
+                    );
+                  }),
+              StreamBuilder<Duration?>(
+                  stream: _player.duration,
+                  builder: (context, snapshot) {
+                    var duration = snapshot.data ?? Duration.zero;
+                    return Text(
+                      duration.toHms(),
+                      style: const TextStyle(color: Colors.grey),
+                    );
+                  }),
+            ],
+          ),
+        ),
+      ),
+    ];
+  }
+
+  Widget _getPlayNextButton() {
+    return SVGButton(
+      function: () => context.read<PlayerBloc>().add(PlayerNext()),
+      color: Colors.white,
+      icon: AssetsIcon.next,
+    );
+  }
+
+  Widget _getRepeatButton() {
+    return SVGButton(
+      function: () {},
+      color: Colors.grey,
+      icon: AssetsIcon.repeat,
+    );
+  }
+
+  StreamBuilder<bool> _getPlayAndPauseButton() {
+    return StreamBuilder<bool>(
+        stream: _player.playing,
+        builder: (context, snapshot) {
+          var isPlaying = snapshot.data ?? false;
+          return StreamBuilder<MediaItem?>(
+              stream: _player.mediaItem,
+              builder: (context, snapshot) {
+                var currentItem = snapshot.data;
+                return RepaintBoundary(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      shape: const CircleBorder(),
+                      padding: EdgeInsets.zero,
+                      fixedSize: const Size.fromRadius(35),
+                    ),
+                    onPressed: () {
+                      if (isPlaying) {
+                        context.read<PlayerBloc>().add(
+                              PlayerPause(),
+                            );
+                      } else {
+                        context.read<PlayerBloc>().add(
+                              PlayerPlay(id: currentItem!.id),
+                            );
+                      }
+                    },
+                    child: Icon(
+                      isPlaying
+                          ? Icons.pause_rounded
+                          : Icons.play_arrow_rounded,
+                      size: 40,
+                      color: Colors.black,
+                    ),
+                  ),
+                );
+              });
+        });
+  }
+
+  Widget _getPlayPreviousButton() {
+    return SVGButton(
+      function: () => context.read<PlayerBloc>().add(PlayerPrevious()),
+      color: Colors.white,
+      icon: AssetsIcon.prev,
+    );
+  }
+
+  Widget _getShuffleButton() {
+    return StreamBuilder<bool>(
+      stream: _player.shuffleModeEnabled,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          bool isEnable = snapshot.data!;
+          return SVGButton(
+            function: () => context
+                .read<PlayerBloc>()
+                .add(PlayerSetShuffleModeEnabled(!isEnable)),
+            icon: AssetsIcon.shuffle,
+            color: isEnable == false ? Colors.grey : Colors.white,
+          );
+        }
+        return const Align();
+      },
     );
   }
 

@@ -5,8 +5,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:vania_music/core/utils/resources/color_manager.dart';
 import 'package:vania_music/core/utils/resources/routes.dart';
 import 'package:vania_music/features/favorite/presentation/bloc/favorite/favorite_bloc.dart';
+import 'package:vania_music/features/music_album/domain/entities/music_album_entity.dart';
 import 'package:vania_music/features/music_album/presentation/bloc/music_album/music_album_bloc.dart';
 import 'package:vania_music/features/player/domain/repository/player_repository.dart';
 import 'package:vania_music/features/player/presentation/bloc/player/player_bloc.dart';
@@ -38,7 +40,6 @@ class _AlbumsScreenState extends State<AlbumsScreen>
   final playerRepository = di<PlayerRepository>();
   @override
   void dispose() async {
-    log('dispose');
     super.dispose();
     await playerRepository.dispose();
     await _stream.cancel();
@@ -46,30 +47,31 @@ class _AlbumsScreenState extends State<AlbumsScreen>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: ColorManager.bg,
       body: Stack(
         children: [
           AppBar(
             backgroundColor: Colors.transparent,
             elevation: 0,
             centerTitle: true,
-            title:  Text(
-              "Vania Music 🎧",
-              style: GoogleFonts.pacifico()
-            ),
+            title: Text("Vania Music 🎧", style: GoogleFonts.pacifico()),
           ),
           BlocBuilder<MusicAlbumBloc, MusicAlbumState>(
             builder: (context, state) {
               if (state is MusicAlbumCompletedState) {
                 return Positioned(
-                  top: 50,
+                  top: 80,
                   left: 0,
                   right: 0,
-                  height: MediaQuery.sizeOf(context).height * .4,
+                  height: MediaQuery.sizeOf(context).height * .9,
                   child: GridView.builder(
+                    scrollDirection: Axis.vertical,
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 50),
+                      horizontal: 10,
+                      vertical: 20,
+                    ),
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
                       childAspectRatio: .9,
@@ -78,42 +80,8 @@ class _AlbumsScreenState extends State<AlbumsScreen>
                       mainAxisSpacing: 10,
                     ),
                     itemBuilder: (ctx, i) {
-                      return Column(
-                        children: [
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () => context.pushNamed(
-                                Routes.music,
-                                extra: state.musicAlbums?[i].link ?? "",
-                              ),
-                              child: Container(
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(15),
-                                  color:
-                                      Theme.of(context).colorScheme.background,
-                                ),
-                                child: Text(
-                                  state.musicAlbums?[i].name!
-                                          .split(" ")[0]
-                                          .toUpperCase() ??
-                                      "",
-                                  style:  GoogleFonts.afacad(
-                                    fontSize: 40,
-                                    fontWeight: FontWeight.w800,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          Text(
-                            "${state.musicAlbums?[i].name}",
-                            style:  GoogleFonts.aBeeZee(
-                                fontSize: 16, fontWeight: FontWeight.w400),
-                          )
-                        ],
+                      return MusicAlbumWidget(
+                        data: state.musicAlbums![i],
                       );
                     },
                     itemCount: state.musicAlbums?.length ?? 0,
@@ -148,6 +116,60 @@ class _AlbumsScreenState extends State<AlbumsScreen>
   }
 
   @override
-  // TODO: implement wantKeepAlive
   bool get wantKeepAlive => false;
+}
+
+class MusicAlbumWidget extends StatelessWidget {
+  const MusicAlbumWidget({
+    super.key,
+    required this.data,
+  });
+  final MusicAlbumEntity data;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Expanded(
+          child: GestureDetector(
+            onTap: () => context.pushNamed(
+              Routes.music,
+              extra: data.link,
+            ),
+            child: Container(
+              alignment: Alignment.center,
+              padding: EdgeInsets.zero,
+              margin: EdgeInsets.zero,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  color: Theme.of(context).colorScheme.background,
+                  image: data.img != null
+                      ? DecorationImage(
+                          image: NetworkImage(data.img!),
+                          fit: BoxFit.fill,
+                        )
+                      : null),
+              child: data.img != null
+                  ? null
+                  : FittedBox(
+                      child: Text(
+                        data.name!.split('Music')[0].toUpperCase(),
+                        style: GoogleFonts.afacad(
+                          fontSize: 40,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 5),
+        Text(
+          "${data.name}",
+          style: GoogleFonts.aBeeZee(fontSize: 16, fontWeight: FontWeight.w400),
+        )
+      ],
+    );
+  }
 }

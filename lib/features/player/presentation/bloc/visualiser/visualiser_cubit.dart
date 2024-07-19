@@ -15,30 +15,16 @@ class VisualiserCubit extends Cubit<VisualiserState> {
       : super(VisualiserInitial.initial());
   final ExtractWaveformUseCase extractWaveformUseCase;
 
-  Waveform? _currentWaveform;
-  static const int _downscaledTargetSize = 100;
-
-  final horizontalPadding = 24.0;
-
   Future<void> excuteWaveExtractor(String url) async {
     emit(VisualiserInitial.initial());
     try {
       DataState dataState = await extractWaveformUseCase(url);
       if (dataState is DataSuccess) {
-          emit(VisualiserComplete(downscaledWaveformList: dataState.data));
+        emit(VisualiserComplete(downscaledWaveformList: dataState.data));
       } else {}
     } catch (e) {
       log(e.toString());
       emit(VisualiserError());
     }
-  }
-
-  void updateDownscaledList(List<int>? list, int targetSize) {
-    final downscaled = list?.reduceListSize(targetSize: targetSize);
-    final newDownscaledWaveformList = downscaled ?? [];
-  
-    // _barWidth = (MediaQuery.of(context).size.width - horizontalPadding) /
-    //     (downscaled?.length ?? 1) *
-    //     0.45;
   }
 }

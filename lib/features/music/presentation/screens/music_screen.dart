@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:just_audio_background/just_audio_background.dart';
+import 'package:vania_music/core/utils/resources/color_manager.dart';
 import 'package:vania_music/core/widgets/blur_background.dart';
 import 'package:vania_music/features/music/presentation/bloc/music/music_bloc.dart';
 import 'package:vania_music/features/music/presentation/widgets/music_widget.dart';
@@ -69,39 +70,38 @@ class _MusicScreenState extends State<MusicScreen> {
   final _player = di<PlayerRepository>();
   @override
   Widget build(BuildContext context) {
-    return Material(
-      child: Scaffold(
-        backgroundColor: Colors.black,
-        body: StreamBuilder<MediaItem?>(
-            stream: _player.mediaItem,
-            builder: (context, snapshot) {
-              return Container(
-                  padding: EdgeInsets.zero,
-                  margin: EdgeInsets.zero,
-                  height: snapshot.data != null
-                      ? MediaQuery.sizeOf(context).height * .93
-                      : MediaQuery.sizeOf(context).height,
-                  child: Scrollbar(
+    return Scaffold(
+      backgroundColor: ColorManager.bg,
+      body: StreamBuilder<MediaItem?>(
+          stream: _player.mediaItem,
+          builder: (context, snapshot) {
+            return Container(
+                padding: EdgeInsets.zero,
+                margin: EdgeInsets.zero,
+                height: snapshot.data != null
+                    ? MediaQuery.sizeOf(context).height * .93
+                    : MediaQuery.sizeOf(context).height,
+                child: Scrollbar(
+                  controller: _scrollController,
+                  interactive: true,
+                  child: CustomScrollView(
+                    shrinkWrap: true,
                     controller: _scrollController,
-                    interactive: true,
-                    child: CustomScrollView(
-                      controller: _scrollController,
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      slivers: [
-                        MusicScreenAppBar(
-                          isCollapased: isCollapased,
-                          api: widget.api,
-                        ),
-                        MusicScreenDetail(
-                          api: widget.api,
-                        ),
-                        const PlayShuffleWidget(),
-                        const TrackListWidget(),
-                      ],
-                    ),
-                  ));
-            }),
-      ),
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    slivers: [
+                      MusicScreenAppBar(
+                        isCollapased: isCollapased,
+                        api: widget.api,
+                      ),
+                      MusicScreenDetail(
+                        api: widget.api,
+                      ),
+                      const PlayShuffleWidget(),
+                      TrackListWidget(),
+                    ],
+                  ),
+                ));
+          }),
     );
   }
 }
@@ -138,13 +138,14 @@ class MusicScreenAppBar extends StatelessWidget {
         (context.read<MusicAlbumBloc>().state as MusicAlbumCompletedState)
                 .musicAlbums
                 ?.firstWhere((e) => e.link == api)
-                .name??"";
+                .name ??
+            "";
     return SliverAppBar(
       title: RepaintBoundary(
         child: isCollapased
             ? Text(
                 title,
-                style:  GoogleFonts.aBeeZee(
+                style: GoogleFonts.aBeeZee(
                   fontSize: 24,
                   fontWeight: FontWeight.w900,
                   color: Colors.grey,
@@ -153,15 +154,15 @@ class MusicScreenAppBar extends StatelessWidget {
             : null,
       ),
       centerTitle: true,
-      backgroundColor: Colors.black,
-      surfaceTintColor: Colors.black,
+      backgroundColor:ColorManager.bg,
+      surfaceTintColor: ColorManager.bg,
       pinned: true,
       leading: IconButton(
         padding: EdgeInsets.zero,
         onPressed: () => Navigator.pop(context),
         icon: const Icon(
           Icons.arrow_back_ios,
-          color: Colors.grey,
+          color: Colors.white,
         ),
       ),
       actions: [
@@ -170,7 +171,7 @@ class MusicScreenAppBar extends StatelessWidget {
           onPressed: () {},
           icon: const Icon(
             Icons.search_rounded,
-            color: Colors.grey,
+            color: Colors.white,
           ),
         )
       ],

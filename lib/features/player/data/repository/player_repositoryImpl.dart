@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:math' show Random;
 
 import 'package:just_audio/just_audio.dart';
@@ -40,14 +41,16 @@ class PlayerRepositoryImpl extends PlayerRepository {
 
   // play
   @override
-  Future<void> play(String? id) async {
-    currentIndex = getMediaItemIndex(id ?? mediaItems[lastIndex].id);
+  Future<void> play(String id) async {
+    currentIndex = getMediaItemIndex(id);
+
+    if (mediaItems[currentIndex].id != (await mediaItem.first)?.id) {
     currentIndexStreamController.add(currentIndex);
-    if (lastIndex != currentIndex) {
       lastIndex = currentIndex;
       await addMediaToPlaylist();
-    }
     currentMediaItemStreamController.add(mediaItems[lastIndex]);
+    }
+
     await audioPlayer.play();
   }
 

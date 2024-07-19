@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:just_audio/just_audio.dart';
@@ -13,11 +15,10 @@ part 'player_state.dart';
 class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
   PlayerRepository playerRepository;
   PlayerBloc(this.playerRepository) : super(PlayerInitial()) {
-
     on<PlayerPlay>(
       (event, emit) async {
         try {
-           await playerRepository.play(event.id);
+          await playerRepository.play(event.id);
           emit(PlayerPlaying());
         } catch (e) {
           emit(PlayerError(e.toString()));
@@ -25,10 +26,10 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
       },
     );
 
-
     on<PlayerAddSongsToPlaylist>((event, emit) {
       if (playerRepository.areMediaItemsEqual(event.songs)) return;
       try {
+        log("PlayerAddSongsToPlaylist");
         playerRepository.addMusicEntityToMediaItems(event.songs);
         emit(PlayerPlaylistLoaded());
       } catch (e) {
@@ -65,7 +66,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
 
     on<PlayerNext>((event, emit) async {
       try {
-         await playerRepository.seekNext();
+        await playerRepository.seekNext();
         emit(PlayerPlaying());
       } catch (e) {
         emit(PlayerError(e.toString()));
@@ -74,7 +75,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
 
     on<PlayerPrevious>((event, emit) async {
       try {
-         await playerRepository.seekPrevious();
+        await playerRepository.seekPrevious();
         emit(PlayerPlaying());
       } catch (e) {
         emit(PlayerError(e.toString()));

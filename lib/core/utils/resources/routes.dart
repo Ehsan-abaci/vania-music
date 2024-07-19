@@ -44,8 +44,7 @@ class RouteGenerator {
           bottomSheet: StreamBuilder<MediaItem?>(
               stream: di<PlayerRepository>().mediaItem,
               builder: (ctx, snapshot) {
-                if (snapshot.hasData ) {
-                  log("routes build");
+                if (snapshot.hasData) {
                   return const MusicBottomSheet();
                 } else {
                   return const SizedBox();

@@ -6,6 +6,7 @@ import 'package:just_audio_background/just_audio_background.dart';
 import 'package:lottie/lottie.dart';
 import 'package:vania_music/core/utils/resources/assets_manager.dart';
 import 'package:vania_music/core/utils/resources/color_manager.dart';
+import 'package:vania_music/core/widgets/animate_list.dart';
 import 'package:vania_music/core/widgets/blur_background.dart';
 import 'package:vania_music/features/file_manager/presentation/value_notifier/download_file.dart';
 import 'package:vania_music/features/file_manager/presentation/widget/download_dialog.dart';
@@ -23,19 +24,9 @@ class Tile {
 }
 
 class TrackListWidget extends StatelessWidget {
-  const TrackListWidget({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MusicsList();
-  }
-}
-
-class MusicsList extends StatelessWidget {
-  MusicsList({super.key});
-  late List<Tile> tiles = [];
+  TrackListWidget({super.key});
+  List<Tile> tiles = [];
   final _player = di<PlayerRepository>();
-
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<MusicBloc, MusicState>(
@@ -51,17 +42,16 @@ class MusicsList extends StatelessWidget {
             child: Center(
               child: Text(
                 state.message ?? "Somthing went wrong...",
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white,
                 ),
               ),
             ),
           );
         } else if (state is MusicCompletedState) {
-          return SliverList(
-              delegate: SliverChildBuilderDelegate(
-            childCount: state.musics.length,
-            (context, i) {
+          return SliverList.builder(
+            itemCount: state.musics.length,
+            itemBuilder: (context, i) {
               tiles = List.generate(
                 state.musics.length,
                 (i) => Tile(
@@ -72,16 +62,20 @@ class MusicsList extends StatelessWidget {
                 ),
               );
               final num = i + 1 > 9 ? "${i + 1}" : "0${i + 1}";
-              return MusicListTile(
-                player: _player,
-                index: i,
-                num: num,
-                tiles: tiles,
+              return AnimateList(
+                keepAlive: true,
+                intervalStart: i / state.musics.length,
+                child: MusicListTile(
+                  player: _player,
+                  index: i,
+                  num: num,
+                  tiles: tiles,
+                ),
               );
             },
-          ));
+          );
         }
-        return SliverToBoxAdapter();
+        return const SliverToBoxAdapter();
       },
     );
   }
@@ -106,6 +100,7 @@ class MusicListTile extends StatefulWidget {
 }
 
 class _MusicListTileState extends State<MusicListTile> {
+  
   void downloadMusic(MusicEntity musicEntity) async {
     di<DownloadFile>().saveMusicInStorage(
       id: musicEntity.id,

@@ -53,7 +53,7 @@ abstract class PlayerRepository {
 
   bool areMediaItemsEqual(List<MusicEntity> songs);
   Future<void> addMediaToPlaylist();
-  Future<void> play(String? id);
+  Future<void> play(String id);
   Future<void> pause();
   Future<void> stop();
   Future<void> seekNext();

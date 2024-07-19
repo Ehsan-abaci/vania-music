@@ -5,9 +5,9 @@ part of 'player_bloc.dart';
 sealed class PlayerEvent {}
 
 class PlayerPlay extends PlayerEvent {
-  final String? id;
+  final String id;
   PlayerPlay({
-   this.id,
+    required this.id,
   });
 }
 

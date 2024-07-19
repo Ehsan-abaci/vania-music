@@ -15,7 +15,7 @@ class VisualiserRepositoryImpl extends VisualiserRepository {
   VisualiserRepositoryImpl(this.fileManagerRepository);
 
   Waveform? _currentWaveform;
-  static const int _downscaledTargetSize = 100;
+  static const int _downscaledTargetSize = 40;
   final _waveformExtractor = WaveformExtractor();
 
   @override

@@ -58,6 +58,7 @@ dependencies:
   google_fonts: ^6.2.1
   waveform_extractor: ^1.0.3
   cached_network_image: ^3.3.1
+  flutter_svg: ^2.0.10+1
   
 dev_dependencies:
   flutter_test:
@@ -84,7 +85,8 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/json/ 
-    - assets/ 
+    - assets/icons/ 
+    - assets/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

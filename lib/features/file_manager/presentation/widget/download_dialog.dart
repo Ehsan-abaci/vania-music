@@ -1,6 +1,5 @@
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:vania_music/features/file_manager/presentation/value_notifier/download_file.dart';
 import 'package:vania_music/locator.dart';
 
@@ -10,11 +9,10 @@ class DownloadDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      
       backgroundColor: Theme.of(context).colorScheme.background,
       child: ValueListenableBuilder(
         valueListenable: di<DownloadFile>().downloadProgressNotifier,
-        builder: (context, progressVal, child) => Container(
+        builder: (context, progressVal, child) => SizedBox(
           height: 120,
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
@@ -29,8 +27,9 @@ class DownloadDialog extends StatelessWidget {
                       valueListenable: di<DownloadFile>().downloadStatus,
                       builder: (context, status, child) {
                         late String text;
-                        if (status == DownloadStatus.downloading)
+                        if (status == DownloadStatus.downloading) {
                           text = "Downloading...";
+                        }
                         if (status == DownloadStatus.downloaded) {
                           text = "Saved";
                           Future.delayed(const Duration(seconds: 1)).then(

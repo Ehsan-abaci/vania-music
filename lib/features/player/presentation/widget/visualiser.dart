@@ -22,12 +22,8 @@ class Visualiser extends StatefulWidget {
 
 class _VisualiserState extends State<Visualiser>
     with AutomaticKeepAliveClientMixin {
-  double _barWidth = 2;
-  Waveform? _currentWaveform;
+  final double _barWidth = 3;
   List<double> _downscaledWaveformList = [];
-  int _downscaledTargetSize = 100;
-
-  final horizontalPadding = 24.0;
 
   final _player = di<PlayerRepository>();
 
@@ -79,53 +75,53 @@ class _VisualiserState extends State<Visualiser>
                           ? 0
                           : (position.inMilliseconds /
                                   duration.inMilliseconds) *
-                              100;
+                              40;
                       return GestureDetector(
                         onTapUp: (details) =>
                             _onVisualiserTap(details, duration),
                         onPanUpdate: (details) =>
                             _onVisualiserUpdate(details, duration),
-                        child: Container(
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(24.0)),
-                          width: widget.width,
-                          child: BlocBuilder<VisualiserCubit, VisualiserState>(
-                            builder: (context, state) {
-                              if (state is VisualiserComplete) {
-                                _downscaledWaveformList =
-                                    state.downscaledWaveformList;
-                              } else if (state is VisualiserInitial) {
-                                _downscaledWaveformList =
-                                    state.downscaledWaveformList;
-                              }
-
-                              return Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                mainAxisSize: MainAxisSize.max,
-                                children: [
-                                  ...List.generate(
-                                    _downscaledWaveformList.length,
-                                    (i) {
-                                      var e = _downscaledWaveformList[i];
-                                      return AnimatedContainer(
-                                        duration:
-                                            const Duration(milliseconds: 300),
-                                        decoration: BoxDecoration(
-                                            color: value.toInt() >= i
-                                                // ? Theme.of(context).colorScheme.onSecondary
-                                                ? Colors.grey.shade700
-                                                : Colors.white70,
-                                            borderRadius:
-                                                BorderRadius.circular(6.0)),
-                                        height: (e).clamp(1.0, 50),
-                                        width: _barWidth,
-                                      );
-                                    },
-                                  ),
-                                ],
-                              );
-                            },
+                        child: FittedBox(
+                          child: Container(
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(24.0)),
+                            width: widget.width,
+                            child: BlocBuilder<VisualiserCubit, VisualiserState>(
+                              builder: (context, state) {
+                                if (state is VisualiserComplete) {
+                                  _downscaledWaveformList =
+                                      state.downscaledWaveformList;
+                                } else if (state is VisualiserInitial) {
+                                  _downscaledWaveformList =
+                                      state.downscaledWaveformList;
+                                }
+                          
+                                return Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    ...List.generate(
+                                      _downscaledWaveformList.length,
+                                      (i) {
+                                        var e = _downscaledWaveformList[i];
+                                        return AnimatedContainer(
+                                          duration:
+                                              const Duration(milliseconds: 300),
+                                          decoration: BoxDecoration(
+                                              color: value.toInt() >= i
+                                                  ? Colors.grey.shade700
+                                                  : Colors.white70,
+                                              borderRadius:
+                                                  BorderRadius.circular(6.0)),
+                                          height: (e).clamp(5.0, 50),
+                                          width: _barWidth,
+                                        );
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
                           ),
                         ),
                       );
@@ -135,6 +131,5 @@ class _VisualiserState extends State<Visualiser>
   }
 
   @override
-  // TODO: implement wantKeepAlive
-  bool get wantKeepAlive => false;
+  bool get wantKeepAlive => true;
 }
