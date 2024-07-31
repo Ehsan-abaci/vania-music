@@ -1,62 +1,35 @@
-import 'dart:async';
-import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:just_audio/just_audio.dart';
-import 'package:vania_music/core/utils/resources/color_manager.dart';
-import 'package:vania_music/core/utils/resources/routes.dart';
-import 'package:vania_music/features/favorite/presentation/bloc/favorite/favorite_bloc.dart';
+import 'package:vania_music/core/utils/resources/route.dart';
 import 'package:vania_music/features/music_album/domain/entities/music_album_entity.dart';
 import 'package:vania_music/features/music_album/presentation/bloc/music_album/music_album_bloc.dart';
-import 'package:vania_music/features/player/domain/repository/player_repository.dart';
-import 'package:vania_music/features/player/presentation/bloc/player/player_bloc.dart';
-import 'package:vania_music/locator.dart';
 
 class AlbumsScreen extends StatefulWidget {
-  const AlbumsScreen({super.key});
+  const AlbumsScreen({super.key, required this.navigatorKey});
+  final GlobalKey<NavigatorState> navigatorKey;
 
   @override
   State<AlbumsScreen> createState() => _AlbumsScreenState();
 }
 
-class _AlbumsScreenState extends State<AlbumsScreen>
-    with AutomaticKeepAliveClientMixin {
-  @override
-  void initState() {
-    super.initState();
-    context.read<MusicAlbumBloc>().add(FetchMusicAlbumEvent());
-    context.read<FavoriteBloc>().add(FetchFavoriteMusics());
-    _stream = playerRepository.audioPlayer.playerStateStream.listen((event) {
-      if (event.processingState == ProcessingState.completed && event.playing) {
-        log('next music in album screen');
-        context.read<PlayerBloc>().add(PlayerNext());
-      }
-    });
-  }
-
-  late final StreamSubscription _stream;
-  final playerRepository = di<PlayerRepository>();
-  @override
-  void dispose() async {
-    super.dispose();
-    await playerRepository.dispose();
-    await _stream.cancel();
+class _AlbumsScreenState extends State<AlbumsScreen> {
+  _goToMuiscScreen(String link) {
+    widget.navigatorKey.currentState!.pushNamed(Routes.music, arguments: link);
   }
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
-    return Scaffold(
-      backgroundColor: ColorManager.bg,
-      body: Stack(
+    return  Stack(
         children: [
           AppBar(
             backgroundColor: Colors.transparent,
             elevation: 0,
             centerTitle: true,
-            title: Text("Vania Music 🎧", style: GoogleFonts.pacifico()),
+            title: Text(
+              "Vania Music 🎧",
+              style: GoogleFonts.pacifico(),
+            ),
           ),
           BlocBuilder<MusicAlbumBloc, MusicAlbumState>(
             builder: (context, state) {
@@ -82,6 +55,7 @@ class _AlbumsScreenState extends State<AlbumsScreen>
                     itemBuilder: (ctx, i) {
                       return MusicAlbumWidget(
                         data: state.musicAlbums![i],
+                        onTap: _goToMuiscScreen,
                       );
                     },
                     itemCount: state.musicAlbums?.length ?? 0,
@@ -111,20 +85,19 @@ class _AlbumsScreenState extends State<AlbumsScreen>
             ),
           ),
         ],
-      ),
+    
     );
   }
-
-  @override
-  bool get wantKeepAlive => false;
 }
 
 class MusicAlbumWidget extends StatelessWidget {
   const MusicAlbumWidget({
     super.key,
     required this.data,
+    required this.onTap,
   });
   final MusicAlbumEntity data;
+  final Function(String) onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -132,10 +105,7 @@ class MusicAlbumWidget extends StatelessWidget {
       children: [
         Expanded(
           child: GestureDetector(
-            onTap: () => context.pushNamed(
-              Routes.music,
-              extra: data.link,
-            ),
+            onTap: () => onTap(data.link!),
             child: Container(
               alignment: Alignment.center,
               padding: EdgeInsets.zero,

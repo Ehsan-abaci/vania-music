@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:vania_music/core/utils/resources/color_manager.dart';
 
 class PlayShuffleWidget extends StatelessWidget {
   const PlayShuffleWidget({super.key});
@@ -7,8 +8,8 @@ class PlayShuffleWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SliverAppBar(
-      backgroundColor: Colors.black,
-      surfaceTintColor: Colors.black,
+      backgroundColor: ColorManager.bg,
+      surfaceTintColor: ColorManager.bg,
       automaticallyImplyLeading: false,
       pinned: true,
       primary: false,
@@ -49,9 +50,7 @@ class PlayShuffleWidget extends StatelessWidget {
                     ),
                   ),
                 ),
-                SizedBox(
-                  width: 10,
-                ),
+                const SizedBox(width: 10),
                 Expanded(
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
@@ -59,13 +58,12 @@ class PlayShuffleWidget extends StatelessWidget {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      fixedSize: Size.fromHeight(50),
-                      // backgroundColor: Theme.of(context).colorScheme.background.withAlpha(170),
+                      fixedSize: const Size.fromHeight(50),
                       backgroundColor: Colors.white70,
                       foregroundColor: Colors.black,
                     ),
                     onPressed: () {},
-                    child: Row(
+                    child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(Icons.shuffle),

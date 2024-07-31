@@ -1,13 +1,11 @@
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:lottie/lottie.dart';
 import 'package:vania_music/core/utils/resources/assets_manager.dart';
-import 'package:vania_music/core/utils/resources/color_manager.dart';
 import 'package:vania_music/core/widgets/animate_list.dart';
-import 'package:vania_music/core/widgets/blur_background.dart';
+import 'package:vania_music/core/widgets/music_shimmer_loading.dart';
 import 'package:vania_music/features/file_manager/presentation/value_notifier/download_file.dart';
 import 'package:vania_music/features/file_manager/presentation/widget/download_dialog.dart';
 import 'package:vania_music/features/music/domain/entities/music_entity.dart';
@@ -33,9 +31,7 @@ class TrackListWidget extends StatelessWidget {
       builder: (context, state) {
         if (state is MusicLoadingState) {
           return const SliverFillRemaining(
-            child: Center(
-              child: CircularProgressIndicator(),
-            ),
+            child: MusicWidgetShimmerLoading(),
           );
         } else if (state is MusicErrorState) {
           return SliverFillRemaining(
@@ -100,7 +96,6 @@ class MusicListTile extends StatefulWidget {
 }
 
 class _MusicListTileState extends State<MusicListTile> {
-  
   void downloadMusic(MusicEntity musicEntity) async {
     di<DownloadFile>().saveMusicInStorage(
       id: musicEntity.id,

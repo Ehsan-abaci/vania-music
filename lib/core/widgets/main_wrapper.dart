@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vania_music/config/theme/bloc/theme_bloc.dart';
-import 'package:vania_music/core/utils/resources/routes.dart';
 import 'package:vania_music/core/widgets/material_app.dart';
 import 'package:vania_music/features/favorite/presentation/bloc/favorite/favorite_bloc.dart';
 import 'package:vania_music/features/music/presentation/bloc/music/music_bloc.dart';

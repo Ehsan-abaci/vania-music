@@ -4,10 +4,12 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:vania_music/core/utils/resources/color_manager.dart';
 import 'package:vania_music/core/widgets/blur_background.dart';
+import 'package:vania_music/features/music/presentation/bloc/cubit/appbar_expanded_cubit.dart';
 import 'package:vania_music/features/music/presentation/bloc/music/music_bloc.dart';
 import 'package:vania_music/features/music/presentation/widgets/music_widget.dart';
 import 'package:vania_music/features/music/presentation/widgets/play_shuffle_widget.dart';
@@ -18,9 +20,13 @@ import 'package:vania_music/locator.dart';
 import '../widgets/track_list_widget.dart';
 
 class MusicScreen extends StatefulWidget {
-  const MusicScreen({super.key, required this.api});
+  const MusicScreen({
+    super.key,
+    required this.api,
+    required this.navigatorKey,
+  });
   final String api;
-
+  final GlobalKey<NavigatorState> navigatorKey;
   @override
   State<MusicScreen> createState() => _MusicScreenState();
 }
@@ -43,20 +49,19 @@ class _MusicScreenState extends State<MusicScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    isCollapased =
+        (context.watch<AppbarExpandedCubit>().state as AppbarExpandedInitial)
+            .isCollapased;
 
     _scrollController = _scrollController ?? ScrollController();
     _scrollController?.addListener(() {
       var specificPixel = MediaQuery.sizeOf(context).height * .1120;
       if (_scrollController!.offset.ceil() > specificPixel.ceil() &&
           !isCollapased) {
-        setState(() {
-          isCollapased = true;
-        });
+        context.read<AppbarExpandedCubit>().toggleExpandation(true);
       } else if (_scrollController!.offset.ceil() < specificPixel.ceil() &&
           isCollapased) {
-        setState(() {
-          isCollapased = false;
-        });
+        context.read<AppbarExpandedCubit>().toggleExpandation(false);
       }
     });
   }
@@ -70,9 +75,7 @@ class _MusicScreenState extends State<MusicScreen> {
   final _player = di<PlayerRepository>();
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: ColorManager.bg,
-      body: StreamBuilder<MediaItem?>(
+    return StreamBuilder<MediaItem?>(
           stream: _player.mediaItem,
           builder: (context, snapshot) {
             return Container(
@@ -81,6 +84,7 @@ class _MusicScreenState extends State<MusicScreen> {
                 height: snapshot.data != null
                     ? MediaQuery.sizeOf(context).height * .93
                     : MediaQuery.sizeOf(context).height,
+                    color: ColorManager.bg,
                 child: Scrollbar(
                   controller: _scrollController,
                   interactive: true,
@@ -92,6 +96,7 @@ class _MusicScreenState extends State<MusicScreen> {
                       MusicScreenAppBar(
                         isCollapased: isCollapased,
                         api: widget.api,
+                        onPop: widget.navigatorKey.currentState!.pop,
                       ),
                       MusicScreenDetail(
                         api: widget.api,
@@ -101,7 +106,7 @@ class _MusicScreenState extends State<MusicScreen> {
                     ],
                   ),
                 ));
-          }),
+          }
     );
   }
 }
@@ -129,9 +134,15 @@ class MusicScreenDetail extends StatelessWidget {
 }
 
 class MusicScreenAppBar extends StatelessWidget {
-  MusicScreenAppBar({super.key, required this.isCollapased, required this.api});
+  MusicScreenAppBar({
+    super.key,
+    required this.isCollapased,
+    required this.api,
+    required this.onPop,
+  });
   bool isCollapased;
   final String api;
+  final VoidCallback onPop;
   @override
   Widget build(BuildContext context) {
     String title =
@@ -154,12 +165,12 @@ class MusicScreenAppBar extends StatelessWidget {
             : null,
       ),
       centerTitle: true,
-      backgroundColor:ColorManager.bg,
+      backgroundColor: ColorManager.bg,
       surfaceTintColor: ColorManager.bg,
       pinned: true,
       leading: IconButton(
         padding: EdgeInsets.zero,
-        onPressed: () => Navigator.pop(context),
+        onPressed: onPop,
         icon: const Icon(
           Icons.arrow_back_ios,
           color: Colors.white,

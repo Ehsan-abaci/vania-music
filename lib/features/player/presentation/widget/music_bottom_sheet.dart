@@ -36,21 +36,8 @@ class _MusicBottomSheetState extends State<MusicBottomSheet>
   Animation? _topMarginAnimation;
   Animation? _borderRadiusAnimation;
   Animation? _opacityAnimation;
-  Gradient? startGradient;
-  Gradient? endGradient;
 
   final PlayerRepository _player = di<PlayerRepository>();
-  @override
-  void dispose() {
-    super.dispose();
-    bottomSheetSizeController?.dispose();
-  }
-
-  @override
-  void initState() {
-    log("init state");
-    super.initState();
-  }
 
   @override
   void didChangeDependencies() {
@@ -88,34 +75,6 @@ class _MusicBottomSheetState extends State<MusicBottomSheet>
           CurvedAnimation(
               parent: bottomSheetSizeController!, curve: Curves.linear),
         );
-    final state = context.watch<ThemeBloc>().state;
-    late Color? color;
-    if (state is ThemeInitial) color = state.theme?.colorScheme.primary;
-    if (state is ThemeComplete) color = state.theme?.colorScheme.primary;
-    startGradient = LinearGradient(
-      begin: Alignment.topCenter,
-      end: Alignment.bottomCenter,
-      stops: const [
-        .1,
-        .4,
-        .9,
-      ],
-      colors: [ColorManager.bg, ColorManager.bg, color ?? ColorManager.bg],
-    );
-    endGradient = LinearGradient(
-      begin: Alignment.topCenter,
-      end: Alignment.bottomCenter,
-      stops: const [
-        .1,
-        .7,
-        .9,
-      ],
-      colors: [
-        ColorManager.bg,
-        ColorManager.bg,
-        color ?? ColorManager.bg,
-      ],
-    );
     _borderRadiusAnimation = _borderRadiusAnimation ??
         Tween<double>(begin: 10, end: 15).animate(CurvedAnimation(
             parent: bottomSheetSizeController!, curve: Curves.linear));
@@ -160,19 +119,9 @@ class _MusicBottomSheetState extends State<MusicBottomSheet>
         onVerticalDragEnd: _handleDragEnd,
         onTap: bottomSheetSizeController?.forward,
         child: Container(
-          width: double.infinity,
           height: _bottomSheetSizeAnimation?.value,
           padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
           color: ColorManager.bg,
-          // decoration: BoxDecoration(
-          //   gradient: bottomSheetSizeController!.isCompleted
-          //       ? endGradient
-          //       : startGradient,
-          //   borderRadius: const BorderRadius.only(
-          //     topLeft: Radius.circular(25),
-          //     topRight: Radius.circular(25),
-          //   ),
-          // ),
           child: StreamBuilder<MediaItem?>(
               stream: _player.mediaItem,
               builder: (context, snapshot) {

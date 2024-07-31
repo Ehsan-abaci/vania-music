@@ -1,16 +1,14 @@
-# vania_music
+# Vania Music🎧 
 
-A new Flutter project.
+A music application by scrapping data from websites.
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
+## Demo
 
-A few resources to get you started if this is your first Flutter project:
+<img src="https://github.com/user-attachments/assets/b321a997-2cb5-4cc8-a848-83d455dd3270" width="250"/>
+<img src="https://github.com/user-attachments/assets/300fdd68-0bdb-41a7-a78a-a377c157bf8a" width="250"/>
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Authors
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- [@Ehsan-abaci](https://www.github.com/Ehsan-abaci)
+

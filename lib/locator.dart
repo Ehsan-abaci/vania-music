@@ -21,6 +21,7 @@ import 'package:vania_music/features/music/data/data_source/remote/music_api_pro
 import 'package:vania_music/features/music/data/repository/music_repositoryImpl.dart';
 import 'package:vania_music/features/music/domain/repository/music_repository.dart';
 import 'package:vania_music/features/music/domain/usecases/get_music_usecase.dart';
+import 'package:vania_music/features/music/presentation/bloc/cubit/appbar_expanded_cubit.dart';
 import 'package:vania_music/features/music/presentation/bloc/music/music_bloc.dart';
 import 'package:vania_music/features/music_album/data/data_source/local/music_album_cache.dart';
 import 'package:vania_music/features/music_album/data/data_source/remote/music_album_api_provider.dart';
@@ -84,6 +85,7 @@ Future<void> initAppModule() async {
   di.registerLazySingleton(() => ThemeBloc(
       di<PlayerRepository>().currentMediaItemStreamController.stream));
   di.registerLazySingleton(() => VisualiserCubit(di()));
+  di.registerLazySingleton(() => AppbarExpandedCubit());
 
   /// Value notifier
   di.registerLazySingleton(() => DownloadFile(di(), di(), di()));

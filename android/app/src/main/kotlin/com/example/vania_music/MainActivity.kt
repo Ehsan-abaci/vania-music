@@ -16,11 +16,12 @@ class MainActivity : FlutterActivity() {
 
 
     override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
-        super.configureFlutterEngine(flutterEngine)
-        MethodChannel(
+        super.configureFlutterEngine(flutterEngine);
+       var methodChannel = MethodChannel(
             flutterEngine.dartExecutor.binaryMessenger,
             CHANNEL
-        ).setMethodCallHandler { call, result ->
+        );
+        methodChannel.setMethodCallHandler { call, result ->
             if (call.method == "saveFileToPath") {
                 val filePath = call.argument<String?>("filePath")
                 val fileContent = call.argument<ByteArray?>("fileContent")
@@ -28,10 +29,7 @@ class MainActivity : FlutterActivity() {
 
                     saveFileToPathViaMethodChannel(
                         this,
-                        channel = MethodChannel(
-                            flutterEngine.dartExecutor.binaryMessenger,
-                            CHANNEL
-                        ),
+                        channel = methodChannel,
                         filePath = filePath,
                         fileContent = fileContent,
                     )

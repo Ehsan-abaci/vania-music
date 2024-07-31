@@ -1,8 +1,5 @@
-import 'dart:developer';
-
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/rendering.dart';
 import 'package:vania_music/core/resources/data_state.dart';
 import 'package:vania_music/features/file_manager/domain/repository/file_manager_repository.dart';
 import 'package:vania_music/features/music/domain/entities/music_entity.dart';
@@ -36,7 +33,6 @@ class MusicBloc extends Bloc<MusicEvent, MusicState> {
       },
     );
     on<ChangeIsDownloadedEvent>((event, emit) {
-      log("change downloaded");
       final musics = (state as MusicCompletedState).musics.map((e) {
         if (e.id == event.id) return e.copyWith(isDownloaded: true);
         return e;
